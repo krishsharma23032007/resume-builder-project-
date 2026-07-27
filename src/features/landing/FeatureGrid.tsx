@@ -26,7 +26,7 @@ const features = [
 
 export function FeatureGrid() {
   return (
-    <section className="border-y-2 border-brutal-ink bg-brutal-yellow" id="features">
+    <section className="scroll-mt-24 border-y-2 border-brutal-ink bg-brutal-yellow" id="features">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-10 max-w-2xl">
           <p className="text-sm font-extrabold text-brutal-ink">Product workflow</p>

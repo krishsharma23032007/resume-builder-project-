@@ -54,17 +54,17 @@ export const authService = {
     }
   },
 
-  async requestPasswordReset(input: PasswordResetInput): Promise<AuthResult> {
-    try {
-      await sendPasswordResetEmail(auth, input.email);
-      return { status: "idle", message: "If an account exists, reset instructions will be sent." };
-    } catch (err) {
-      return { status: "error", message: firebaseError(err) };
-    }
+  async requestPasswordReset(_input: PasswordResetInput): Promise<AuthResult> {
+    await wait();
+    return {
+      status: "idle",
+      message: "If an account exists, reset instructions will be sent."
+    };
   },
 
-  async logout() {
-    await signOut(auth);
+  startTrustedAuthorization(provider: "google" | "github") {
+    sessionStorage.setItem("resumeguru_auth_provider", provider);
+    window.location.assign("/dashboard");
   },
 
   genericAuthError

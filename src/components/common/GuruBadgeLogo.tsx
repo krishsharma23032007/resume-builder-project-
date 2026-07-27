@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { FileText, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type GuruBadgeLogoProps = {
@@ -26,15 +26,13 @@ export function GuruBadgeLogo({ size = "md", className }: GuruBadgeLogoProps) {
     <span
       aria-hidden="true"
       className={cn(
-        "relative grid shrink-0 place-items-center rounded-full border-2 border-brutal-ink bg-brutal-sage text-brutal-ink shadow-hard",
+        "relative grid shrink-0 place-items-center rounded-xl border-2 border-brutal-ink bg-white text-brutal-ink shadow-hard",
         selectedSize.wrap,
         className
       )}
     >
-      <span className={cn("font-display font-extrabold tracking-tighter", selectedSize.text)}>
-        RG
-      </span>
-      <span className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full border-2 border-brutal-ink bg-brutal-yellow">
+      <FileText size={size === "md" ? 23 : 19} strokeWidth={3} />
+      <span className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full border-2 border-brutal-ink bg-brutal-yellow text-brutal-ink">
         <Sparkles size={selectedSize.icon} strokeWidth={3} />
       </span>
     </span>
