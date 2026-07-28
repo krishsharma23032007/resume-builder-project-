@@ -37,12 +37,17 @@ export function AuthCard({ mode }: AuthCardProps) {
   const { errors } = form.formState;
 
   async function handleSubmit(values: LoginFormValues & RegisterFormValues) {
+    form.clearErrors();
     const schema = isForgot ? passwordResetSchema : isRegister ? registerSchema : loginSchema;
     const parsed = schema.safeParse(values);
 
     if (!parsed.success) {
-      const firstError = parsed.error.issues[0];
-      form.setError(firstError.path[0] as "email", { message: firstError.message });
+      parsed.error.issues.forEach((issue) => {
+        const fieldName = issue.path[0] as "email" | "name" | "password";
+        if (fieldName) {
+          form.setError(fieldName, { message: issue.message });
+        }
+      });
       return;
     }
 
@@ -55,6 +60,13 @@ export function AuthCard({ mode }: AuthCardProps) {
 
     if (result.status === "authenticated") {
       navigate("/dashboard");
+      return;
+    }
+
+    if (isForgot || result.status === "idle") {
+      form.setError("root", {
+        message: result.message || "Reset link sent! If an account exists, please check your inbox."
+      });
       return;
     }
 
