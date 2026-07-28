@@ -68,9 +68,16 @@ export function AuthCard({ mode }: AuthCardProps) {
       await signInWithPopup(auth, new GoogleAuthProvider());
       navigate("/dashboard");
     } catch (error: unknown) {
+      console.error("Google Sign-In Error:", error);
       const code = (error as { code?: string }).code ?? "";
       if (code !== "auth/popup-closed-by-user") {
-        form.setError("root", { message: "Google sign-in failed. Try again." });
+        if (code === "auth/unauthorized-domain") {
+          form.setError("root", {
+            message: "Domain not authorized in Firebase Console. Please add resume-builder-project-pink.vercel.app to Authorized Domains."
+          });
+        } else {
+          form.setError("root", { message: `Google sign-in failed (${code || "Unknown error"}). Try again.` });
+        }
       }
     }
   }
