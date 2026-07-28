@@ -1,0 +1,37 @@
+import { api } from "./apiClient";
+
+interface ImproveBulletPayload {
+  bullet: string;
+}
+
+interface ImproveBulletResponse {
+  improvedBullet: string;
+}
+
+interface GenerateSummaryPayload {
+  resumeContent: string;
+}
+
+interface GenerateSummaryResponse {
+  summary: string;
+}
+
+interface GenerateCoverLetterPayload {
+  jobDescription: string;
+  resumeContent: string;
+}
+
+interface GenerateCoverLetterResponse {
+  coverLetter: string;
+}
+
+export const aiService = {
+  improveBullet: (payload: ImproveBulletPayload) =>
+    api.post<ImproveBulletResponse>("/ai/improve", payload),
+
+  generateSummary: (payload: GenerateSummaryPayload) =>
+    api.post<GenerateSummaryResponse>("/ai/summary", payload),
+
+  generateCoverLetter: (payload: GenerateCoverLetterPayload) =>
+    api.post<GenerateCoverLetterResponse>("/ai/cover-letter", payload),
+};
