@@ -1,10 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
-
 import { ShieldCheck } from "lucide-react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -28,8 +27,6 @@ export function AuthCard({ mode }: AuthCardProps) {
   const navigate = useNavigate();
   const isRegister = mode === "register";
   const isForgot = mode === "forgot";
-  const navigate = useNavigate();
-  const { login, register, requestPasswordReset, startTrustedAuthorization, status } = useAuth();
   const { login, register, requestPasswordReset, status } = useAuth();
   const form = useForm<LoginFormValues & RegisterFormValues & PasswordResetFormValues>({
     defaultValues: {
@@ -42,16 +39,10 @@ export function AuthCard({ mode }: AuthCardProps) {
 
   async function handleSubmit(values: LoginFormValues & RegisterFormValues) {
     form.clearErrors();
-    form.clearErrors();
     const schema = isForgot ? passwordResetSchema : isRegister ? registerSchema : loginSchema;
     const parsed = schema.safeParse(values);
 
     if (!parsed.success) {
-      const firstError = parsed.error.issues[0];
-      const field = firstError.path[0];
-      if (field === "name" || field === "email" || field === "password") {
-        form.setError(field, { message: firstError.message });
-      }
       parsed.error.issues.forEach((issue) => {
         const fieldName = issue.path[0] as "email" | "name" | "password";
         if (fieldName) {
@@ -62,18 +53,6 @@ export function AuthCard({ mode }: AuthCardProps) {
     }
 
     const result = await submitParsedAuth(parsed.data);
-
-    if (result.status === "authenticated") {
-      toast.success(result.message);
-      navigate("/dashboard");
-      return;
-    }
-
-    if (isForgot && result.status === "idle") {
-      toast.success(result.message);
-      navigate("/login");
-      return;
-    }
 
     if (result.status === "error") {
       form.setError("root", { message: result.message });
@@ -94,7 +73,6 @@ export function AuthCard({ mode }: AuthCardProps) {
 
     if (result.status === "locked" || result.status === "rate_limited") {
       form.setError("root", { message: result.message });
-      toast.error(result.message);
     }
   }
 
@@ -168,7 +146,15 @@ export function AuthCard({ mode }: AuthCardProps) {
             </FieldError>
           ) : null}
           {errors.root?.message ? (
-            <p className="rounded-xl border-2 border-brutal-ink bg-white p-3 text-sm font-extrabold" role="alert">
+            <p
+              className={cn(
+                "rounded-xl border-2 border-brutal-ink p-3 text-sm font-extrabold shadow-hard",
+                errors.root.message.includes("sent") || errors.root.message.includes("created")
+                  ? "bg-green-100 text-green-900"
+                  : "bg-red-100 text-red-900"
+              )}
+              role="alert"
+            >
               {errors.root.message}
             </p>
           ) : null}
@@ -180,10 +166,6 @@ export function AuthCard({ mode }: AuthCardProps) {
         {!isForgot ? (
           <Button
             className="mt-4 w-full"
-            onClick={() => {
-              toast.success("Continuing with trusted provider.");
-              startTrustedAuthorization("google");
-            }}
             disabled={status === "submitting"}
             onClick={handleGoogleSignIn}
             type="button"
