@@ -1,14 +1,6 @@
 import { z } from "zod";
 import { cleanAuthText, cleanDisplayName, normalizeEmail } from "@/utils/sanitize";
 
-const passwordSchema = z
-  .string()
-  .min(12, "Use at least 12 characters.")
-  .regex(/[A-Z]/, "Add an uppercase letter.")
-  .regex(/[a-z]/, "Add a lowercase letter.")
-  .regex(/[0-9]/, "Add a number.")
-  .regex(/[^A-Za-z0-9]/, "Add a symbol.");
-
 export const loginSchema = z.object({
   email: z
     .string({ required_error: "Email is required." })

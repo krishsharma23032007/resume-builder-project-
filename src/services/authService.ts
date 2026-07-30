@@ -54,17 +54,18 @@ export const authService = {
     }
   },
 
-  async requestPasswordReset(_input: PasswordResetInput): Promise<AuthResult> {
-    await wait();
-    return {
-      status: "idle",
-      message: "If an account exists, reset instructions will be sent."
-    };
+  async requestPasswordReset(input: PasswordResetInput): Promise<AuthResult> {
+    try {
+      await sendPasswordResetEmail(auth, input.email);
+      return { status: "idle", message: "If an account exists, reset instructions will be sent." };
+    } catch (err) {
+      // Return idle to prevent account enumeration
+      return { status: "idle", message: "If an account exists, reset instructions will be sent." };
+    }
   },
 
-  startTrustedAuthorization(provider: "google" | "github") {
-    sessionStorage.setItem("resumeguru_auth_provider", provider);
-    window.location.assign("/dashboard");
+  async logout() {
+    await signOut(auth);
   },
 
   genericAuthError
