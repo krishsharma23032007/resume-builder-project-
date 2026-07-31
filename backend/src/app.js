@@ -6,6 +6,7 @@ const analyzeRoutes = require("./routes/analyze");
 const aiRoutes = require("./routes/ai");
 const verifyToken = require("./middleware/auth");
 const rateLimiter = require("./middleware/rateLimiter");
+const sanitizeInput = require("./middleware/sanitize");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -41,6 +42,7 @@ const corsOptions = {
 app.set("trust proxy", 1);
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
+app.use(sanitizeInput);
 app.use(rateLimiter);
 
 app.get("/", (req, res) => {
