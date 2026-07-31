@@ -3,11 +3,17 @@ import { FileText, Gauge, Plus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { MetricCard } from "@/features/dashboard/MetricCard";
-import { ResumeCard } from "@/features/resume/ResumeCard";
 import { useResume } from "@/context/ResumeContext";
 
 export function DashboardPage() {
-  const { resumes } = useResume();
+  const { resumeData } = useResume();
+
+  const totalEntries =
+    resumeData.education.length +
+    resumeData.experience.length +
+    resumeData.projects.length +
+    resumeData.skills.length +
+    resumeData.certifications.length;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -24,31 +30,24 @@ export function DashboardPage() {
         </Link>
       </div>
       <div className="mt-8 grid gap-4 md:grid-cols-3">
-        <MetricCard detail="Across active resumes" icon={FileText} label="Resumes" value="12" />
-        <MetricCard detail="Best active version" icon={Gauge} label="Top ATS score" value="92" />
-        <MetricCard detail="Generated this week" icon={Sparkles} label="AI rewrites" value="48" />
+        <MetricCard detail="Across active resumes" icon={FileText} label="Sections" value={String(totalEntries)} />
+        <MetricCard detail="Best active version" icon={Gauge} label="Top ATS score" value="--" />
+        <MetricCard detail="Generated this week" icon={Sparkles} label="AI rewrites" value="--" />
       </div>
-      <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_360px]">
-        <section>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Recent resumes</h2>
-            <Link className="text-sm text-primary" to="/resumes">View all</Link>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {resumes.map((resume) => <ResumeCard key={resume.id} resume={resume} />)}
-          </div>
-        </section>
+      <div className="mt-8">
         <Card>
-          <p className="text-sm font-semibold text-primary">ATS analysis</p>
-          <h2 className="mt-2 text-xl font-semibold">Product Design Lead</h2>
-          <div className="mt-6 grid place-items-center rounded-lg bg-muted py-10">
-            <div className="grid size-32 place-items-center rounded-full border-8 border-accent text-3xl font-semibold">
-              92
-            </div>
-          </div>
-          <p className="mt-5 text-sm leading-6 text-muted-foreground">
-            Strong keyword alignment. Add one quantified leadership result to improve recruiter signal.
+          <h2 className="font-semibold">Your Resume</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {resumeData.personal.name
+              ? `Building resume for ${resumeData.personal.name} - ${resumeData.personal.role}`
+              : "Start building your resume by filling in your personal information."}
           </p>
+          <Link className="mt-4 inline-block" to="/resume/new">
+            <Button size="sm">
+              <Plus size={16} />
+              {resumeData.personal.name ? "Edit resume" : "Start building"}
+            </Button>
+          </Link>
         </Card>
       </div>
     </div>
