@@ -1,0 +1,443 @@
+import { useState } from "react";
+import type { ResumeData } from "@/types/resume";
+import { cn } from "@/lib/utils";
+
+type ResumePreviewProps = {
+  data: ResumeData;
+};
+
+type Template = "classic" | "modern" | "compact";
+
+const templateOptions: { value: Template; label: string }[] = [
+  { value: "classic", label: "Classic" },
+  { value: "modern", label: "Modern" },
+  { value: "compact", label: "Compact" }
+];
+
+export function ResumePreview({ data }: ResumePreviewProps) {
+  const [template, setTemplate] = useState<Template>("classic");
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Template selector */}
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-xs font-medium text-muted-foreground">Template:</span>
+        {templateOptions.map((opt) => (
+          <button
+            key={opt.value}
+            onClick={() => setTemplate(opt.value)}
+            className={cn(
+              "rounded-lg px-3 py-1 text-xs font-semibold transition-colors",
+              template === opt.value
+                ? "bg-brutal-ink text-white"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            )}
+            type="button"
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Resume preview */}
+      <div className="flex-1 overflow-y-auto rounded-lg border bg-white p-6 shadow-soft">
+        {template === "classic" && <ClassicTemplate data={data} />}
+        {template === "modern" && <ModernTemplate data={data} />}
+        {template === "compact" && <CompactTemplate data={data} />}
+      </div>
+    </div>
+  );
+}
+
+function SectionTitle({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <h3 className={cn("text-xs font-bold uppercase tracking-wider border-b pb-1 mb-2", className)}>
+      {children}
+    </h3>
+  );
+}
+
+function ClassicTemplate({ data }: { data: ResumeData }) {
+  return (
+    <div className="space-y-4 text-xs">
+      {/* Header */}
+      <div className="text-center border-b pb-3">
+        <h1 className="text-xl font-bold">{data.personal.name || "Your Name"}</h1>
+        <p className="text-sm text-gray-600 mt-1">{data.personal.role || "Target Role"}</p>
+        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-2 text-[10px] text-gray-500">
+          {data.personal.email && <span>{data.personal.email}</span>}
+          {data.personal.phone && <span>{data.personal.phone}</span>}
+          {data.personal.location && <span>{data.personal.location}</span>}
+        </div>
+      </div>
+
+      {data.personal.summary && (
+        <div>
+          <SectionTitle>Summary</SectionTitle>
+          <p className="text-[11px] leading-5 text-gray-700">{data.personal.summary}</p>
+        </div>
+      )}
+
+      {data.education.length > 0 && (
+        <div>
+          <SectionTitle>Education</SectionTitle>
+          {data.education.map((e) => (
+            <div key={e.id} className="mb-2">
+              <div className="flex justify-between">
+                <span className="font-semibold">{e.degree} {e.field && `in ${e.field}`}</span>
+                <span className="text-[10px] text-gray-500">{e.startDate} - {e.endDate}</span>
+              </div>
+              <p className="text-gray-600">{e.institution}</p>
+              {e.gpa && <p className="text-[10px] text-gray-500">GPA: {e.gpa}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {data.experience.length > 0 && (
+        <div>
+          <SectionTitle>Experience</SectionTitle>
+          {data.experience.map((e) => (
+            <div key={e.id} className="mb-3">
+              <div className="flex justify-between">
+                <span className="font-semibold">{e.title}</span>
+                <span className="text-[10px] text-gray-500">{e.startDate} - {e.endDate}</span>
+              </div>
+              <p className="text-gray-600">{e.company}{e.location && `, ${e.location}`}</p>
+              {e.description && <p className="text-[11px] text-gray-700 mt-1">{e.description}</p>}
+              {e.bullets.filter(Boolean).length > 0 && (
+                <ul className="mt-1 list-disc pl-4 space-y-0.5">
+                  {e.bullets.filter(Boolean).map((b, i) => (
+                    <li key={i} className="text-[11px] text-gray-700">{b}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {data.projects.length > 0 && (
+        <div>
+          <SectionTitle>Projects</SectionTitle>
+          {data.projects.map((p) => (
+            <div key={p.id} className="mb-2">
+              <p className="font-semibold">{p.name}</p>
+              <p className="text-[11px] text-gray-700">{p.description}</p>
+              {p.technologies && <p className="text-[10px] text-gray-500">Tech: {p.technologies}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {data.skills.length > 0 && (
+        <div>
+          <SectionTitle>Skills</SectionTitle>
+          {data.skills.map((s) => (
+            <p key={s.id} className="text-[11px] mb-1">
+              <span className="font-semibold">{s.category}:</span> {s.items.join(", ")}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {data.certifications.length > 0 && (
+        <div>
+          <SectionTitle>Certifications</SectionTitle>
+          {data.certifications.map((c) => (
+            <p key={c.id} className="text-[11px] mb-1">{c.name} - {c.issuer} ({c.date})</p>
+          ))}
+        </div>
+      )}
+
+      {data.achievements.length > 0 && (
+        <div>
+          <SectionTitle>Achievements</SectionTitle>
+          {data.achievements.map((a) => (
+            <p key={a.id} className="text-[11px] mb-1"><span className="font-semibold">{a.title}:</span> {a.description}</p>
+          ))}
+        </div>
+      )}
+
+      {data.responsibilities.length > 0 && (
+        <div>
+          <SectionTitle>Positions of Responsibility</SectionTitle>
+          {data.responsibilities.map((r) => (
+            <p key={r.id} className="text-[11px] mb-1">{r.role} at {r.organization}</p>
+          ))}
+        </div>
+      )}
+
+      {data.languages.length > 0 && (
+        <div>
+          <SectionTitle>Languages</SectionTitle>
+          <p className="text-[11px]">{data.languages.map((l) => `${l.name} (${l.proficiency})`).join(", ")}</p>
+        </div>
+      )}
+
+      {data.interests.length > 0 && (
+        <div>
+          <SectionTitle>Interests</SectionTitle>
+          <p className="text-[11px]">{data.interests.map((i) => i.name).join(", ")}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ModernTemplate({ data }: { data: ResumeData }) {
+  return (
+    <div className="space-y-4 text-xs">
+      {/* Header - left aligned with accent */}
+      <div className="border-l-4 border-blue-600 pl-4">
+        <h1 className="text-2xl font-bold text-gray-900">{data.personal.name || "Your Name"}</h1>
+        <p className="text-sm font-medium text-blue-600 mt-1">{data.personal.role || "Target Role"}</p>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[10px] text-gray-500">
+          {data.personal.email && <span>{data.personal.email}</span>}
+          {data.personal.phone && <span>{data.personal.phone}</span>}
+          {data.personal.location && <span>{data.personal.location}</span>}
+        </div>
+      </div>
+
+      {data.personal.summary && (
+        <div>
+          <p className="text-[11px] leading-5 text-gray-700 italic">{data.personal.summary}</p>
+        </div>
+      )}
+
+      {data.education.length > 0 && (
+        <div>
+          <SectionTitle className="text-blue-600 border-blue-600">Education</SectionTitle>
+          {data.education.map((e) => (
+            <div key={e.id} className="mb-2 flex justify-between items-start">
+              <div>
+                <span className="font-semibold">{e.degree} {e.field && `in ${e.field}`}</span>
+                <p className="text-gray-600">{e.institution}</p>
+                {e.gpa && <p className="text-[10px] text-gray-500">GPA: {e.gpa}</p>}
+              </div>
+              <span className="text-[10px] text-gray-500 whitespace-nowrap">{e.startDate} - {e.endDate}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {data.experience.length > 0 && (
+        <div>
+          <SectionTitle className="text-blue-600 border-blue-600">Experience</SectionTitle>
+          {data.experience.map((e) => (
+            <div key={e.id} className="mb-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="font-semibold">{e.title}</span>
+                  <span className="text-gray-600"> at {e.company}</span>
+                  {e.location && <span className="text-gray-500">, {e.location}</span>}
+                </div>
+                <span className="text-[10px] text-gray-500 whitespace-nowrap">{e.startDate} - {e.endDate}</span>
+              </div>
+              {e.description && <p className="text-[11px] text-gray-700 mt-1">{e.description}</p>}
+              {e.bullets.filter(Boolean).length > 0 && (
+                <ul className="mt-1 list-disc pl-4 space-y-0.5">
+                  {e.bullets.filter(Boolean).map((b, i) => (
+                    <li key={i} className="text-[11px] text-gray-700">{b}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {data.projects.length > 0 && (
+        <div>
+          <SectionTitle className="text-blue-600 border-blue-600">Projects</SectionTitle>
+          {data.projects.map((p) => (
+            <div key={p.id} className="mb-2">
+              <p className="font-semibold">{p.name}</p>
+              <p className="text-[11px] text-gray-700">{p.description}</p>
+              {p.technologies && <p className="text-[10px] text-gray-500">Tech: {p.technologies}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {data.skills.length > 0 && (
+        <div>
+          <SectionTitle className="text-blue-600 border-blue-600">Skills</SectionTitle>
+          {data.skills.map((s) => (
+            <p key={s.id} className="text-[11px] mb-1">
+              <span className="font-semibold">{s.category}:</span> {s.items.join(", ")}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {data.certifications.length > 0 && (
+        <div>
+          <SectionTitle className="text-blue-600 border-blue-600">Certifications</SectionTitle>
+          {data.certifications.map((c) => (
+            <p key={c.id} className="text-[11px] mb-1">{c.name} - {c.issuer} ({c.date})</p>
+          ))}
+        </div>
+      )}
+
+      {data.achievements.length > 0 && (
+        <div>
+          <SectionTitle className="text-blue-600 border-blue-600">Achievements</SectionTitle>
+          {data.achievements.map((a) => (
+            <p key={a.id} className="text-[11px] mb-1"><span className="font-semibold">{a.title}:</span> {a.description}</p>
+          ))}
+        </div>
+      )}
+
+      {data.responsibilities.length > 0 && (
+        <div>
+          <SectionTitle className="text-blue-600 border-blue-600">Positions of Responsibility</SectionTitle>
+          {data.responsibilities.map((r) => (
+            <p key={r.id} className="text-[11px] mb-1">{r.role} at {r.organization}</p>
+          ))}
+        </div>
+      )}
+
+      {data.languages.length > 0 && (
+        <div>
+          <SectionTitle className="text-blue-600 border-blue-600">Languages</SectionTitle>
+          <p className="text-[11px]">{data.languages.map((l) => `${l.name} (${l.proficiency})`).join(", ")}</p>
+        </div>
+      )}
+
+      {data.interests.length > 0 && (
+        <div>
+          <SectionTitle className="text-blue-600 border-blue-600">Interests</SectionTitle>
+          <p className="text-[11px]">{data.interests.map((i) => i.name).join(", ")}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CompactTemplate({ data }: { data: ResumeData }) {
+  return (
+    <div className="space-y-2 text-[10px]">
+      {/* Header - compact */}
+      <div className="text-center pb-2 border-b">
+        <h1 className="text-lg font-bold">{data.personal.name || "Your Name"}</h1>
+        <p className="text-xs text-gray-600">{data.personal.role || "Target Role"}</p>
+        <div className="flex flex-wrap justify-center gap-x-2 gap-y-0.5 mt-1 text-[9px] text-gray-500">
+          {data.personal.email && <span>{data.personal.email}</span>}
+          {data.personal.phone && <span>| {data.personal.phone}</span>}
+          {data.personal.location && <span>| {data.personal.location}</span>}
+        </div>
+      </div>
+
+      {data.personal.summary && (
+        <p className="text-[10px] leading-4 text-gray-700">{data.personal.summary}</p>
+      )}
+
+      {data.education.length > 0 && (
+        <div>
+          <h3 className="text-[9px] font-bold uppercase tracking-wider">Education</h3>
+          <div className="border-t mt-0.5 mb-1" />
+          {data.education.map((e) => (
+            <div key={e.id} className="flex justify-between mb-0.5">
+              <span><span className="font-semibold">{e.degree}</span> {e.field && `${e.field}`} - {e.institution}</span>
+              <span className="text-gray-500">{e.startDate}-{e.endDate}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {data.experience.length > 0 && (
+        <div>
+          <h3 className="text-[9px] font-bold uppercase tracking-wider">Experience</h3>
+          <div className="border-t mt-0.5 mb-1" />
+          {data.experience.map((e) => (
+            <div key={e.id} className="mb-1.5">
+              <div className="flex justify-between">
+                <span className="font-semibold">{e.title} - {e.company}</span>
+                <span className="text-gray-500">{e.startDate}-{e.endDate}</span>
+              </div>
+              {e.bullets.filter(Boolean).length > 0 && (
+                <ul className="list-disc pl-3 mt-0.5">
+                  {e.bullets.filter(Boolean).map((b, i) => (
+                    <li key={i} className="text-gray-700">{b}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {data.projects.length > 0 && (
+        <div>
+          <h3 className="text-[9px] font-bold uppercase tracking-wider">Projects</h3>
+          <div className="border-t mt-0.5 mb-1" />
+          {data.projects.map((p) => (
+            <div key={p.id} className="mb-1">
+              <span className="font-semibold">{p.name}</span> - {p.description}
+              {p.technologies && <span className="text-gray-500"> [{p.technologies}]</span>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {data.skills.length > 0 && (
+        <div>
+          <h3 className="text-[9px] font-bold uppercase tracking-wider">Skills</h3>
+          <div className="border-t mt-0.5 mb-1" />
+          {data.skills.map((s) => (
+            <p key={s.id} className="mb-0.5">
+              <span className="font-semibold">{s.category}:</span> {s.items.join(", ")}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {data.certifications.length > 0 && (
+        <div>
+          <h3 className="text-[9px] font-bold uppercase tracking-wider">Certifications</h3>
+          <div className="border-t mt-0.5 mb-1" />
+          {data.certifications.map((c) => (
+            <p key={c.id} className="mb-0.5">{c.name} - {c.issuer} ({c.date})</p>
+          ))}
+        </div>
+      )}
+
+      {data.achievements.length > 0 && (
+        <div>
+          <h3 className="text-[9px] font-bold uppercase tracking-wider">Achievements</h3>
+          <div className="border-t mt-0.5 mb-1" />
+          {data.achievements.map((a) => (
+            <p key={a.id} className="mb-0.5"><span className="font-semibold">{a.title}:</span> {a.description}</p>
+          ))}
+        </div>
+      )}
+
+      {data.responsibilities.length > 0 && (
+        <div>
+          <h3 className="text-[9px] font-bold uppercase tracking-wider">Positions</h3>
+          <div className="border-t mt-0.5 mb-1" />
+          {data.responsibilities.map((r) => (
+            <p key={r.id} className="mb-0.5">{r.role} at {r.organization}</p>
+          ))}
+        </div>
+      )}
+
+      {data.languages.length > 0 && (
+        <div>
+          <h3 className="text-[9px] font-bold uppercase tracking-wider">Languages</h3>
+          <div className="border-t mt-0.5 mb-1" />
+          <p>{data.languages.map((l) => `${l.name} (${l.proficiency})`).join(", ")}</p>
+        </div>
+      )}
+
+      {data.interests.length > 0 && (
+        <div>
+          <h3 className="text-[9px] font-bold uppercase tracking-wider">Interests</h3>
+          <div className="border-t mt-0.5 mb-1" />
+          <p>{data.interests.map((i) => i.name).join(", ")}</p>
+        </div>
+      )}
+    </div>
+  );
+}

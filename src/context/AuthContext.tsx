@@ -17,7 +17,7 @@ type AuthContextValue = {
   login: (input: LoginInput) => Promise<AuthResult>;
   register: (input: RegisterInput) => Promise<AuthResult>;
   requestPasswordReset: (input: PasswordResetInput) => Promise<AuthResult>;
-  logout: () => void;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -78,8 +78,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       register: (input: RegisterInput) => runAuth(() => authService.register(input)),
       requestPasswordReset: (input: PasswordResetInput) =>
         runAuth(() => authService.requestPasswordReset(input)),
-      logout: () => {
-        authService.logout();
+      logout: async () => {
+        try {
+          await authService.logout();
+        } catch (error) {
+          console.error("Logout error:", error);
+        }
         setUser(null);
         setStatus("idle");
       }

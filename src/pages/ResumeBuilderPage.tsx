@@ -1,7 +1,6 @@
 import { Save, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
 import { useAuth } from "@/context/AuthContext";
 import { useResume } from "@/context/ResumeContext";
 import { PersonalInfoForm } from "@/components/resume/PersonalInfoForm";
@@ -15,6 +14,7 @@ import { ResponsibilitiesForm } from "@/components/resume/ResponsibilitiesForm";
 import { LanguagesForm } from "@/components/resume/LanguagesForm";
 import { InterestsForm } from "@/components/resume/InterestsForm";
 import { SectionOrder } from "@/components/resume/SectionOrder";
+import { ResumePreview } from "@/components/resume/ResumePreview";
 import {
   resumeService,
   type AnalyzeResult,
@@ -24,8 +24,6 @@ import {
   type SummaryResult
 } from "@/services/resumeService";
 import { useState } from "react";
-
-const sectionComponents: Record<string, React.FC> = {};
 
 export function ResumeBuilderPage() {
   const {
@@ -247,131 +245,8 @@ export function ResumeBuilderPage() {
       </section>
 
       {/* Right sidebar - Preview */}
-      <aside className="rounded-lg border bg-card p-5">
-        <div className="mx-auto aspect-[210/297] max-w-sm bg-background p-6 shadow-soft overflow-y-auto">
-          <h2 className="text-2xl font-semibold">{resumeData.personal.name || "Your Name"}</h2>
-          <p className="text-sm text-primary">{resumeData.personal.role || "Target Role"}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{resumeData.personal.email} | {resumeData.personal.phone} | {resumeData.personal.location}</p>
-          {resumeData.personal.summary && (
-            <p className="mt-4 text-xs leading-5 text-muted-foreground">{resumeData.personal.summary}</p>
-          )}
-
-          {resumeData.education.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider">Education</h3>
-              <div className="mt-1 border-t" />
-              {resumeData.education.map((e) => (
-                <div key={e.id} className="mt-2">
-                  <p className="text-xs font-semibold">{e.degree} {e.field && `in ${e.field}`}</p>
-                  <p className="text-xs text-muted-foreground">{e.institution}</p>
-                  <p className="text-[10px] text-muted-foreground">{e.startDate} - {e.endDate}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {resumeData.experience.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider">Experience</h3>
-              <div className="mt-1 border-t" />
-              {resumeData.experience.map((e) => (
-                <div key={e.id} className="mt-2">
-                  <p className="text-xs font-semibold">{e.title} at {e.company}</p>
-                  <p className="text-[10px] text-muted-foreground">{e.startDate} - {e.endDate}</p>
-                  {e.bullets.filter(Boolean).length > 0 && (
-                    <ul className="mt-1 list-disc pl-4">
-                      {e.bullets.filter(Boolean).map((b, i) => (
-                        <li key={i} className="text-[10px] text-muted-foreground">{b}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {resumeData.skills.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider">Skills</h3>
-              <div className="mt-1 border-t" />
-              {resumeData.skills.map((s) => (
-                <p key={s.id} className="mt-1 text-[10px] text-muted-foreground">
-                  <span className="font-semibold">{s.category}:</span> {s.items.join(", ")}
-                </p>
-              ))}
-            </div>
-          )}
-
-          {resumeData.projects.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider">Projects</h3>
-              <div className="mt-1 border-t" />
-              {resumeData.projects.map((p) => (
-                <div key={p.id} className="mt-2">
-                  <p className="text-xs font-semibold">{p.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{p.description}</p>
-                  {p.technologies && <p className="text-[10px] text-muted-foreground">Tech: {p.technologies}</p>}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {resumeData.certifications.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider">Certifications</h3>
-              <div className="mt-1 border-t" />
-              {resumeData.certifications.map((c) => (
-                <div key={c.id} className="mt-1">
-                  <p className="text-[10px] text-muted-foreground">{c.name} - {c.issuer} ({c.date})</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {resumeData.achievements.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider">Achievements</h3>
-              <div className="mt-1 border-t" />
-              {resumeData.achievements.map((a) => (
-                <div key={a.id} className="mt-1">
-                  <p className="text-[10px] text-muted-foreground">{a.title}: {a.description}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {resumeData.responsibilities.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider">Positions of Responsibility</h3>
-              <div className="mt-1 border-t" />
-              {resumeData.responsibilities.map((r) => (
-                <div key={r.id} className="mt-1">
-                  <p className="text-[10px] text-muted-foreground">{r.role} at {r.organization}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {resumeData.languages.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider">Languages</h3>
-              <div className="mt-1 border-t" />
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                {resumeData.languages.map((l) => `${l.name} (${l.proficiency})`).join(", ")}
-              </p>
-            </div>
-          )}
-
-          {resumeData.interests.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider">Interests</h3>
-              <div className="mt-1 border-t" />
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                {resumeData.interests.map((i) => i.name).join(", ")}
-              </p>
-            </div>
-          )}
-        </div>
+      <aside className="rounded-lg border bg-card p-5 flex flex-col">
+        <ResumePreview data={resumeData} />
       </aside>
     </div>
   );
