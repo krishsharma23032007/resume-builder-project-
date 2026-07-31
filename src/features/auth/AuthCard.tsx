@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { auth } from "@/lib/firebase";
+import { cn } from "@/lib/utils";
 import {
   loginSchema,
   passwordResetSchema,
@@ -15,7 +16,6 @@ import {
   type PasswordResetFormValues,
   type RegisterFormValues
 } from "@/features/auth/authSchemas";
-import { authService } from "@/services/authService";
 import { useAuth } from "@/context/AuthContext";
 import type { AuthMode } from "@/types/auth";
 
@@ -44,8 +44,8 @@ export function AuthCard({ mode }: AuthCardProps) {
 
     if (!parsed.success) {
       parsed.error.issues.forEach((issue) => {
-        const fieldName = issue.path[0] as "email" | "name" | "password";
-        if (fieldName) {
+        const fieldName = issue.path[0];
+        if (fieldName === "email" || fieldName === "name" || fieldName === "password") {
           form.setError(fieldName, { message: issue.message });
         }
       });
@@ -54,43 +54,38 @@ export function AuthCard({ mode }: AuthCardProps) {
 
     const result = await submitParsedAuth(parsed.data);
 
+    if (result.status === "authenticated") {
+      toast.success(result.message);
+      navigate("/dashboard");
+      return;
+    }
+
+    if (isForgot && result.status === "idle") {
+      toast.success(result.message);
+      navigate("/login");
+      return;
+    }
+
     if (result.status === "error") {
       form.setError("root", { message: result.message });
       return;
     }
 
-    if (result.status === "authenticated") {
-      navigate("/dashboard");
-      return;
-    }
-
-    if (isForgot || result.status === "idle") {
-      form.setError("root", {
-        message: result.message || "Reset link sent! If an account exists, please check your inbox."
-      });
-      return;
-    }
-
     if (result.status === "locked" || result.status === "rate_limited") {
       form.setError("root", { message: result.message });
+      toast.error(result.message);
     }
   }
 
   async function handleGoogleSignIn() {
     try {
       await signInWithPopup(auth, new GoogleAuthProvider());
+      toast.success("Signed in with Google.");
       navigate("/dashboard");
     } catch (error: unknown) {
-      console.error("Google Sign-In Error:", error);
       const code = (error as { code?: string }).code ?? "";
       if (code !== "auth/popup-closed-by-user") {
-        if (code === "auth/unauthorized-domain") {
-          form.setError("root", {
-            message: "Domain not authorized in Firebase Console. Please add resume-builder-project-pink.vercel.app to Authorized Domains."
-          });
-        } else {
-          form.setError("root", { message: `Google sign-in failed (${code || "Unknown error"}). Try again.` });
-        }
+        form.setError("root", { message: "Google sign-in failed. Try again." });
       }
     }
   }
