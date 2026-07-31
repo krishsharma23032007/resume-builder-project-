@@ -17,6 +17,7 @@ import {
   type RegisterFormValues
 } from "@/features/auth/authSchemas";
 import { useAuth } from "@/context/AuthContext";
+import { getRemainingAttempts } from "@/utils/rateLimit";
 import type { AuthMode } from "@/types/auth";
 
 type AuthCardProps = {
@@ -52,6 +53,16 @@ export function AuthCard({ mode }: AuthCardProps) {
       return;
     }
 
+    // Show remaining attempts warning before login
+    if (!isForgot && !isRegister) {
+      const remaining = getRemainingAttempts(parsed.data.email);
+      if (remaining <= 2 && remaining > 0) {
+        toast(`Warning: ${remaining} attempt${remaining === 1 ? "" : "s"} remaining before lockout.`, {
+          icon: "⚠️"
+        });
+      }
+    }
+
     const result = await submitParsedAuth(parsed.data);
 
     if (result.status === "authenticated") {
@@ -71,7 +82,7 @@ export function AuthCard({ mode }: AuthCardProps) {
       return;
     }
 
-    if (result.status === "locked" || result.status === "rate_limited") {
+    if (result.status === "rate_limited") {
       form.setError("root", { message: result.message });
       toast.error(result.message);
     }
@@ -85,7 +96,8 @@ export function AuthCard({ mode }: AuthCardProps) {
     } catch (error: unknown) {
       const code = (error as { code?: string }).code ?? "";
       if (code !== "auth/popup-closed-by-user") {
-        form.setError("root", { message: "Google sign-in failed. Try again." });
+        // Generic message - don't expose internal error details
+        form.setError("root", { message: "Google sign-in failed. Please try again." });
       }
     }
   }
@@ -107,7 +119,10 @@ export function AuthCard({ mode }: AuthCardProps) {
   return (
     <main className="grid min-h-[calc(100vh-4rem)] place-items-center bg-brutal-yellow px-4 py-12 pt-28">
       <Card className="w-full max-w-md">
-        <p className="text-sm font-extrabold text-brutal-line">ResumeGuru secure access</p>
+        <div className="flex items-center gap-2">
+          <ShieldCheck size={20} className="text-green-600" />
+          <p className="text-sm font-extrabold text-brutal-line">ResumeGuru secure access</p>
+        </div>
         <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tighter">
           {isForgot ? "Reset your password" : isRegister ? "Create your account" : "Welcome back"}
         </h1>
@@ -124,16 +139,29 @@ export function AuthCard({ mode }: AuthCardProps) {
         >
           {isRegister ? (
             <FieldError message={errors.name?.message}>
-              <Input autoComplete="name" placeholder="Full name" type="text" {...form.register("name")} />
+              <Input
+                autoComplete="name"
+                maxLength={80}
+                placeholder="Full name"
+                type="text"
+                {...form.register("name")}
+              />
             </FieldError>
           ) : null}
           <FieldError message={errors.email?.message}>
-            <Input autoComplete="email" placeholder="Email address" type="email" {...form.register("email")} />
+            <Input
+              autoComplete="email"
+              maxLength={254}
+              placeholder="Email address"
+              type="email"
+              {...form.register("email")}
+            />
           </FieldError>
           {!isForgot ? (
             <FieldError message={errors.password?.message}>
               <Input
                 autoComplete={isRegister ? "new-password" : "current-password"}
+                maxLength={128}
                 placeholder="Password"
                 type="password"
                 {...form.register("password")}
