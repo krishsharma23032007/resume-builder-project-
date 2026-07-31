@@ -59,7 +59,7 @@ export const authService = {
       await sendPasswordResetEmail(auth, input.email);
       return { status: "idle", message: "If an account exists, reset instructions will be sent." };
     } catch (err) {
-      // Return idle to prevent account enumeration
+      console.warn("Password reset request failed:", err);
       return { status: "idle", message: "If an account exists, reset instructions will be sent." };
     }
   },
