@@ -60,5 +60,21 @@ export const resumeService = {
     tone: "formal" | "enthusiastic" | "concise" = "formal"
   ): Promise<CoverLetterResult> {
     return api.post("/api/ai/cover-letter", { resumeData, jobDescription, tone });
+  },
+
+  async generatePdf(resumeData: ResumeData, template: string = "classic"): Promise<Blob> {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"}/api/pdf/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ resumeData, template })
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to generate PDF");
+    }
+
+    return response.blob();
   }
 };

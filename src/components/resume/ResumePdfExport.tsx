@@ -211,10 +211,38 @@ type ExportButtonProps = {
   data: ResumeData;
   template: TemplateType;
   className?: string;
+  useServer?: boolean;
 };
 
-export function ResumePdfExport({ data, template, className }: ExportButtonProps) {
+export function ResumePdfExport({ data, template, className, useServer = false }: ExportButtonProps) {
   const fileName = `${data.personal.name || "Resume"}_${template}.pdf`;
+
+  if (useServer) {
+    return (
+      <button
+        className={className}
+        onClick={async () => {
+          try {
+            const { resumeService } = await import("@/services/resumeService");
+            const blob = await resumeService.generatePdf(data, template);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          } catch (error) {
+            console.error("Server PDF generation failed, falling back to client:", error);
+          }
+        }}
+        type="button"
+      >
+        Export PDF (Server)
+      </button>
+    );
+  }
 
   return (
     <PDFDownloadLink
