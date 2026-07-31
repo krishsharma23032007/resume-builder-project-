@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { Download } from "lucide-react";
 import type { ResumeData } from "@/types/resume";
 import { cn } from "@/lib/utils";
+import { ResumePdfExport } from "@/components/resume/ResumePdfExport";
+import { Button } from "@/components/ui/Button";
 
 type ResumePreviewProps = {
   data: ResumeData;
@@ -19,24 +22,31 @@ export function ResumePreview({ data }: ResumePreviewProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Template selector */}
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-xs font-medium text-muted-foreground">Template:</span>
-        {templateOptions.map((opt) => (
-          <button
-            key={opt.value}
-            onClick={() => setTemplate(opt.value)}
-            className={cn(
-              "rounded-lg px-3 py-1 text-xs font-semibold transition-colors",
-              template === opt.value
-                ? "bg-brutal-ink text-white"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            )}
-            type="button"
-          >
-            {opt.label}
-          </button>
-        ))}
+      {/* Template selector and Export */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Template:</span>
+          {templateOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setTemplate(opt.value)}
+              className={cn(
+                "rounded-lg px-3 py-1 text-xs font-semibold transition-colors",
+                template === opt.value
+                  ? "bg-brutal-ink text-white"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              )}
+              type="button"
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <ResumePdfExport
+          data={data}
+          template={template}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-brutal-ink text-white px-3 py-1.5 text-xs font-semibold hover:bg-brutal-ink/90 transition-colors no-underline"
+        />
       </div>
 
       {/* Resume preview */}
@@ -60,7 +70,6 @@ function SectionTitle({ children, className }: { children: React.ReactNode; clas
 function ClassicTemplate({ data }: { data: ResumeData }) {
   return (
     <div className="space-y-4 text-xs">
-      {/* Header */}
       <div className="text-center border-b pb-3">
         <h1 className="text-xl font-bold">{data.personal.name || "Your Name"}</h1>
         <p className="text-sm text-gray-600 mt-1">{data.personal.role || "Target Role"}</p>
@@ -188,7 +197,6 @@ function ClassicTemplate({ data }: { data: ResumeData }) {
 function ModernTemplate({ data }: { data: ResumeData }) {
   return (
     <div className="space-y-4 text-xs">
-      {/* Header - left aligned with accent */}
       <div className="border-l-4 border-blue-600 pl-4">
         <h1 className="text-2xl font-bold text-gray-900">{data.personal.name || "Your Name"}</h1>
         <p className="text-sm font-medium text-blue-600 mt-1">{data.personal.role || "Target Role"}</p>
@@ -318,7 +326,6 @@ function ModernTemplate({ data }: { data: ResumeData }) {
 function CompactTemplate({ data }: { data: ResumeData }) {
   return (
     <div className="space-y-2 text-[10px]">
-      {/* Header - compact */}
       <div className="text-center pb-2 border-b">
         <h1 className="text-lg font-bold">{data.personal.name || "Your Name"}</h1>
         <p className="text-xs text-gray-600">{data.personal.role || "Target Role"}</p>
