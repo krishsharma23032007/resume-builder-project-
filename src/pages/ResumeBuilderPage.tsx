@@ -1,4 +1,4 @@
-import { FileText, Save, Sparkles, UploadCloud } from "lucide-react";
+import { BriefcaseBusiness, FileText, Save, Sparkles, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -47,6 +47,7 @@ export function ResumeBuilderPage() {
 
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
+  const [selectedResumeId, setSelectedResumeId] = useState("current");
   const [bullet, setBullet] = useState("");
   const [analysis, setAnalysis] = useState<AnalyzeResult | null>(null);
   const [match, setMatch] = useState<MatchResult | null>(null);
@@ -190,15 +191,41 @@ export function ResumeBuilderPage() {
               {analysis ? <AtsAnalysisReport analysis={analysis} /> : null}
             </div>
 
-            <div className="space-y-3">
-              <label className="block text-sm font-medium" htmlFor="job-description">Job description</label>
-              <textarea
-                className="min-h-24 w-full rounded-lg border bg-background p-3 text-sm"
-                id="job-description"
-                onChange={(event) => setJobDescription(event.target.value)}
-                placeholder="Paste the target job description"
-                value={jobDescription}
-              />
+            <div className="space-y-3 lg:col-span-2">
+              <div className="flex items-center gap-2">
+                <BriefcaseBusiness size={18} />
+                <h3 className="font-semibold">Job description match</h3>
+              </div>
+              <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
+                <label className="block space-y-2">
+                  <span className="text-sm font-medium">Select resume</span>
+                  <select
+                    className="h-11 w-full rounded-xl border-2 border-brutal-ink bg-white px-3 text-sm font-medium text-brutal-ink shadow-hard"
+                    onChange={(event) => {
+                      setSelectedResumeId(event.target.value);
+                      setMatch(null);
+                    }}
+                    value={selectedResumeId}
+                  >
+                    <option value="current">
+                      {resumeData.personal.name || resumeData.personal.role ? `${resumeData.personal.name || "Current resume"} - ${resumeData.personal.role || "Draft"}` : "Current resume draft"}
+                    </option>
+                  </select>
+                </label>
+                <label className="block space-y-2">
+                  <span className="text-sm font-medium">Job description</span>
+                  <textarea
+                    className="min-h-32 w-full rounded-xl border-2 border-brutal-ink bg-white p-3 text-sm font-medium text-brutal-ink shadow-hard placeholder:text-brutal-line"
+                    id="job-description"
+                    onChange={(event) => {
+                      setJobDescription(event.target.value);
+                      setMatch(null);
+                    }}
+                    placeholder="Paste the target job description"
+                    value={jobDescription}
+                  />
+                </label>
+              </div>
               <div className="flex flex-wrap gap-2">
                 <Button
                   disabled={!jobDescription.trim() || loadingAction === "match"}
@@ -207,7 +234,7 @@ export function ResumeBuilderPage() {
                   type="button"
                   variant="outline"
                 >
-                  {loadingAction === "match" ? "Matching..." : "Match job"}
+                  {loadingAction === "match" ? "Matching..." : "Compare resume"}
                 </Button>
                 <Button
                   disabled={!jobDescription.trim() || loadingAction === "cover-letter"}
@@ -219,7 +246,7 @@ export function ResumeBuilderPage() {
                   {loadingAction === "cover-letter" ? "Writing..." : "Cover letter"}
                 </Button>
               </div>
-              {match && <p className="text-sm">Job match: {match.matchPercentage}%. Missing: {match.missingKeywords.join(", ") || "none"}.</p>}
+              {match ? <JobMatchReport match={match} /> : null}
             </div>
 
             <div className="space-y-3">
@@ -265,6 +292,54 @@ export function ResumeBuilderPage() {
       <aside className="rounded-lg border bg-card p-5 flex flex-col">
         <ResumePreview data={resumeData} />
       </aside>
+    </div>
+  );
+}
+
+
+function JobMatchReport({ match }: { match: MatchResult }) {
+  return (
+    <div className="space-y-4 rounded-xl border-2 border-brutal-ink bg-background p-4 shadow-hard">
+      <div className="grid gap-4 lg:grid-cols-[180px_1fr]">
+        <div className="rounded-xl border-2 border-brutal-ink bg-white p-4 text-center">
+          <p className="text-xs font-extrabold uppercase text-muted-foreground">Match percentage</p>
+          <p className="mt-2 text-4xl font-extrabold">{match.matchPercentage}%</p>
+          <div className="mt-4 h-2 rounded-full bg-muted">
+            <div className="h-full rounded-full bg-brutal-sage" style={{ width: `${Math.min(Math.max(match.matchPercentage, 0), 100)}%` }} />
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <KeywordList items={match.matchedKeywords} title="Matched keywords" tone="good" />
+          <KeywordList items={match.missingKeywords} title="Missing keywords" tone="warn" />
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <ReportList emptyText="No skill gaps found." items={match.skillGaps} title="Skill gaps" />
+        <ReportList emptyText="No experience gaps found." items={match.experienceGaps} title="Experience gaps" />
+        <ReportList emptyText="No recommendations returned." items={match.recommendations} title="Recommendations" />
+      </div>
+    </div>
+  );
+}
+
+function KeywordList({ items, title, tone }: { items: string[]; title: string; tone: "good" | "warn" }) {
+  const badgeClass = tone === "good" ? "bg-brutal-sage" : "bg-brutal-yellow";
+
+  return (
+    <div className="rounded-xl border-2 border-brutal-ink bg-white p-4">
+      <h4 className="text-sm font-extrabold">{title}</h4>
+      {items.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {items.map((item) => (
+            <span className={`${badgeClass} rounded-full border-2 border-brutal-ink px-3 py-1 text-xs font-extrabold`} key={item}>
+              {item}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-3 text-sm text-muted-foreground">None returned.</p>
+      )}
     </div>
   );
 }
