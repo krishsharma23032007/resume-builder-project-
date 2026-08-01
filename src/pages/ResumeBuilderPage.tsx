@@ -1,6 +1,7 @@
-import { Save, Sparkles } from "lucide-react";
+import { FileText, Save, Sparkles, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import { useAuth } from "@/context/AuthContext";
 import { useResume } from "@/context/ResumeContext";
 import { PersonalInfoForm } from "@/components/resume/PersonalInfoForm";
@@ -150,27 +151,43 @@ export function ResumeBuilderPage() {
           {toolError && <p className="mt-3 text-sm text-red-600">{toolError}</p>}
 
           <div className="mt-5 grid gap-5 lg:grid-cols-2">
-            <div className="space-y-3">
-              <label className="block text-sm font-medium" htmlFor="resume-pdf">Resume PDF</label>
-              <input
-                accept="application/pdf"
-                className="block w-full text-sm"
-                id="resume-pdf"
-                onChange={(event) => setResumeFile(event.target.files?.[0] ?? null)}
-                type="file"
-              />
-              <Button
-                disabled={!resumeFile || loadingAction === "analyze"}
-                onClick={() => runTool("analyze", async () => setAnalysis(await resumeService.analyzeResume(resumeFile!)))}
-                size="sm"
-                type="button"
-                variant="outline"
-              >
-                {loadingAction === "analyze" ? "Analyzing..." : "Analyze resume"}
-              </Button>
-              {analysis && (
-                <p className="text-sm">ATS {analysis.atsScore}/100. {analysis.suggestions[0] || "No suggestions."}</p>
-              )}
+            <div className="space-y-3 lg:col-span-2">
+              <label className="block text-sm font-medium" htmlFor="resume-pdf">Upload resume PDF</label>
+              <div className="rounded-xl border-2 border-dashed border-brutal-ink bg-white p-4 shadow-hard">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-brutal-ink bg-brutal-yellow">
+                      <UploadCloud size={20} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-extrabold">{resumeFile ? resumeFile.name : "Choose a PDF resume"}</p>
+                      <p className="text-xs text-muted-foreground">Posts securely to /api/analyze for ATS scoring.</p>
+                    </div>
+                  </div>
+                  <Input
+                    accept="application/pdf"
+                    className="max-w-sm bg-background"
+                    id="resume-pdf"
+                    onChange={(event) => {
+                      setResumeFile(event.target.files?.[0] ?? null);
+                      setAnalysis(null);
+                    }}
+                    type="file"
+                  />
+                </div>
+                <Button
+                  className="mt-4"
+                  disabled={!resumeFile || loadingAction === "analyze"}
+                  onClick={() => runTool("analyze", async () => setAnalysis(await resumeService.analyzeResume(resumeFile!)))}
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                >
+                  <FileText size={16} />
+                  {loadingAction === "analyze" ? "Analyzing..." : "Analyze ATS"}
+                </Button>
+              </div>
+              {analysis ? <AtsAnalysisReport analysis={analysis} /> : null}
             </div>
 
             <div className="space-y-3">
@@ -248,6 +265,69 @@ export function ResumeBuilderPage() {
       <aside className="rounded-lg border bg-card p-5 flex flex-col">
         <ResumePreview data={resumeData} />
       </aside>
+    </div>
+  );
+}
+
+
+function AtsAnalysisReport({ analysis }: { analysis: AnalyzeResult }) {
+  const scores = [
+    { label: "ATS score", value: analysis.atsScore },
+    { label: "Formatting", value: analysis.formattingScore },
+    { label: "Content", value: analysis.contentScore },
+    { label: "Readability", value: analysis.readabilityScore }
+  ];
+
+  return (
+    <div className="space-y-4 rounded-xl border-2 border-brutal-ink bg-background p-4 shadow-hard">
+      <div>
+        <h3 className="text-lg font-semibold">ATS Analysis</h3>
+        <p className="mt-1 text-sm text-muted-foreground">Scores and recommendations from your uploaded PDF.</p>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {scores.map((score) => (
+          <div className="rounded-xl border-2 border-brutal-ink bg-white p-3" key={score.label}>
+            <p className="text-xs font-extrabold uppercase text-muted-foreground">{score.label}</p>
+            <p className="mt-2 text-3xl font-extrabold">{score.value}</p>
+            <div className="mt-3 h-2 rounded-full bg-muted">
+              <div className="h-full rounded-full bg-brutal-sage" style={{ width: `${Math.min(Math.max(score.value, 0), 100)}%` }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ReportList emptyText="No missing sections detected." items={analysis.missingSections} title="Missing sections" />
+        <ReportList emptyText="No suggestions returned." items={analysis.suggestions} title="Suggestions" />
+      </div>
+
+      <div>
+        <h4 className="text-sm font-extrabold">Extracted text preview</h4>
+        <div className="mt-2 max-h-56 overflow-auto rounded-xl border-2 border-brutal-ink bg-white p-3 text-xs leading-5 text-muted-foreground">
+          {analysis.extractedText || "No text preview available."}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReportList({ emptyText, items, title }: { emptyText: string; items: string[]; title: string }) {
+  return (
+    <div className="rounded-xl border-2 border-brutal-ink bg-white p-4">
+      <h4 className="text-sm font-extrabold">{title}</h4>
+      {items.length > 0 ? (
+        <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+          {items.map((item) => (
+            <li className="flex gap-2" key={item}>
+              <span className="mt-2 size-1.5 shrink-0 rounded-full bg-brutal-ink" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-sm text-muted-foreground">{emptyText}</p>
+      )}
     </div>
   );
 }
