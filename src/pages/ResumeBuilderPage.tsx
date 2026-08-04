@@ -21,8 +21,7 @@ import {
   type AnalyzeResult,
   type CoverLetterResult,
   type ImproveResult,
-  type MatchResult,
-  type SummaryResult
+  type MatchResult
 } from "@/services/resumeService";
 import { useState } from "react";
 
@@ -52,7 +51,6 @@ export function ResumeBuilderPage() {
   const [analysis, setAnalysis] = useState<AnalyzeResult | null>(null);
   const [match, setMatch] = useState<MatchResult | null>(null);
   const [improvement, setImprovement] = useState<ImproveResult | null>(null);
-  const [summary, setSummary] = useState<SummaryResult | null>(null);
   const [coverLetter, setCoverLetter] = useState<CoverLetterResult | null>(null);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [toolError, setToolError] = useState("");
@@ -84,7 +82,7 @@ export function ResumeBuilderPage() {
   function renderSection(key: string) {
     switch (key) {
       case "personal":
-        return <PersonalInfoForm data={resumeData.personal} onChange={updatePersonal} />;
+        return <PersonalInfoForm data={resumeData.personal} onChange={updatePersonal} resumeData={resumeDataForApi} />;
       case "education":
         return <EducationForm data={resumeData.education} onChange={updateEducation} />;
       case "experience":
@@ -272,16 +270,6 @@ export function ResumeBuilderPage() {
 
             <div className="space-y-3">
               <p className="text-sm font-medium">Profile summary</p>
-              <Button
-                disabled={loadingAction === "summary"}
-                onClick={() => runTool("summary", async () => setSummary(await resumeService.generateSummary(resumeDataForApi)))}
-                size="sm"
-                type="button"
-                variant="outline"
-              >
-                {loadingAction === "summary" ? "Writing..." : "Generate summary"}
-              </Button>
-              {summary && <p className="text-sm">{summary.summary}</p>}
               {coverLetter && <p className="text-sm whitespace-pre-line">{coverLetter.coverLetter}</p>}
             </div>
           </div>
