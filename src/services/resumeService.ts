@@ -57,9 +57,11 @@ export const resumeService = {
   async generateCoverLetter(
     resumeData: ResumeData,
     jobDescription: string,
-    tone: "formal" | "enthusiastic" | "concise" = "formal"
+    tone: "formal" | "enthusiastic" | "concise" = "formal",
+    company?: string,
+    jobTitle?: string
   ): Promise<CoverLetterResult> {
-    return api.post("/api/ai/cover-letter", { resumeData, jobDescription, tone });
+    return api.post("/api/ai/cover-letter", { resumeData, jobDescription, tone, company, jobTitle });
   },
 
   async generatePdf(resumeData: ResumeData, template: string = "classic"): Promise<Blob> {

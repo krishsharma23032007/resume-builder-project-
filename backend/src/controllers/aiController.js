@@ -118,7 +118,7 @@ Return only the summary text.`;
 
 async function generateCoverLetter(req, res) {
   try {
-    const { resumeData, jobDescription, tone = "formal" } = req.body;
+    const { resumeData, jobDescription, tone = "formal", company, jobTitle } = req.body;
     const allowedTones = ["formal", "enthusiastic", "concise"];
 
     if (!resumeData || !jobDescription) {
@@ -129,13 +129,32 @@ async function generateCoverLetter(req, res) {
       return res.status(400).json({ error: "tone must be one of: formal, enthusiastic, concise." });
     }
 
-    const prompt = `Write a cover letter for this candidate applying to this job. Tone: ${tone}. Match their experience to the job requirements. Keep it under 300 words. Professional format.
+    const cleanCompany = company ? sanitizeInput(company) : "";
+    const cleanJobTitle = jobTitle ? sanitizeInput(jobTitle) : "";
+    const cleanJobDesc = sanitizeInput(jobDescription);
+
+    const targetInfo = [
+      cleanCompany ? `Company: ${cleanCompany}` : "",
+      cleanJobTitle ? `Job Title: ${cleanJobTitle}` : ""
+    ].filter(Boolean).join("\n");
+
+    const prompt = `Write a professional cover letter for this candidate. Tone: ${tone}. Keep it under 300 words. Professional format with greeting, body paragraphs, and closing.
 
 Resume:
 ${JSON.stringify(resumeData, null, 2)}
 
 Job Description:
-${jobDescription}
+${cleanJobDesc}
+${targetInfo ? `\n${targetInfo}` : ""}
+
+Rules:
+- Address the letter to the hiring manager
+- Match the candidate's experience to the job requirements
+- Highlight relevant skills and achievements
+- Use the specified tone: ${tone}
+- Keep it under 300 words
+${cleanCompany ? `- Mention the company name: ${cleanCompany}` : ""}
+${cleanJobTitle ? `- Reference the specific role: ${cleanJobTitle}` : ""}
 
 Return only the cover letter text.`;
 
@@ -143,7 +162,7 @@ Return only the cover letter text.`;
     return res.json({ coverLetter, tone });
   } catch (error) {
     console.error("Cover letter error:", error);
-    return res.status(500).json({ error: "Failed to generate cover letter." });
+    return res.status(500).json({ error: "Failed to generate cover letter. Please try again later." });
   }
 }
 

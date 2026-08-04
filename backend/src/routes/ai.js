@@ -27,7 +27,9 @@ router.post(
   validateBody({
     resumeData: (value) => validateObject(value, "resumeData"),
     jobDescription: (value) => validateString(value, "jobDescription", { maxLength: 5000 }),
-    tone: (value) => validateEnum(value, "tone", ["formal", "enthusiastic", "concise"], { required: false })
+    tone: (value) => validateEnum(value, "tone", ["formal", "enthusiastic", "concise"], { required: false }),
+    company: (value) => validateString(value, "company", { required: false, maxLength: 200 }),
+    jobTitle: (value) => validateString(value, "jobTitle", { required: false, maxLength: 200 })
   }),
   generateCoverLetter
 );

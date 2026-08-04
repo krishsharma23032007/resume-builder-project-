@@ -19,7 +19,6 @@ import { ResumePreview } from "@/components/resume/ResumePreview";
 import {
   resumeService,
   type AnalyzeResult,
-  type CoverLetterResult,
   type ImproveResult,
   type MatchResult
 } from "@/services/resumeService";
@@ -51,7 +50,6 @@ export function ResumeBuilderPage() {
   const [analysis, setAnalysis] = useState<AnalyzeResult | null>(null);
   const [match, setMatch] = useState<MatchResult | null>(null);
   const [improvement, setImprovement] = useState<ImproveResult | null>(null);
-  const [coverLetter, setCoverLetter] = useState<CoverLetterResult | null>(null);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [toolError, setToolError] = useState("");
 
@@ -234,15 +232,6 @@ export function ResumeBuilderPage() {
                 >
                   {loadingAction === "match" ? "Matching..." : "Compare resume"}
                 </Button>
-                <Button
-                  disabled={!jobDescription.trim() || loadingAction === "cover-letter"}
-                  onClick={() => runTool("cover-letter", async () => setCoverLetter(await resumeService.generateCoverLetter(resumeDataForApi, jobDescription)))}
-                  size="sm"
-                  type="button"
-                  variant="outline"
-                >
-                  {loadingAction === "cover-letter" ? "Writing..." : "Cover letter"}
-                </Button>
               </div>
               {match ? <JobMatchReport match={match} /> : null}
             </div>
@@ -270,7 +259,6 @@ export function ResumeBuilderPage() {
 
             <div className="space-y-3">
               <p className="text-sm font-medium">Profile summary</p>
-              {coverLetter && <p className="text-sm whitespace-pre-line">{coverLetter.coverLetter}</p>}
             </div>
           </div>
         </Card>

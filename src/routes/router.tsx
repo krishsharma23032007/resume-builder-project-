@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "@/layouts/AppLayout";
 import { MarketingLayout } from "@/layouts/MarketingLayout";
+import { CoverLetterPage } from "@/pages/CoverLetterPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { ForgotPasswordPage } from "@/pages/ForgotPasswordPage";
 import { LandingPage } from "@/pages/LandingPage";
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
       { path: "/resumes", element: <ResumeLibraryPage /> },
       { path: "/resume/new", element: <ResumeBuilderPage /> },
       { path: "/resume/:id", element: <ResumeBuilderPage /> },
+      { path: "/cover-letter", element: <CoverLetterPage /> },
       { path: "/templates", element: <TemplatesPage /> },
       { path: "/settings", element: <SettingsPage /> }
     ]
