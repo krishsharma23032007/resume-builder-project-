@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { FormSection, EntryCard, FieldRow } from "@/components/resume/FormSection";
 import { AiImproveButton } from "@/components/common/AiImproveButton";
 import { AiGrammarButton } from "@/components/common/AiGrammarButton";
+import { AiSuggestButton } from "@/components/common/AiSuggestButton";
 import type { ExperienceEntry } from "@/types/resume";
 import { generateId } from "@/utils/generateId";
 import { Plus, Trash2 } from "lucide-react";
@@ -142,6 +143,15 @@ export function ExperienceForm({ data, onChange }: ExperienceFormProps) {
               <Plus size={14} />
               Add bullet
             </Button>
+            <AiSuggestButton
+              role={entry.title}
+              context={entry.description}
+              type="experience"
+              onInsert={(bullet) => {
+                const newBullets = [...entry.bullets, bullet];
+                update(entry.id, "bullets", newBullets);
+              }}
+            />
           </div>
         </EntryCard>
       ))}

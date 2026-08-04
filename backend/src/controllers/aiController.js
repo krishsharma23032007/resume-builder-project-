@@ -304,9 +304,65 @@ Rules:
   }
 }
 
+async function suggestAchievements(req, res) {
+  try {
+    const { role, context, type = "experience" } = req.body;
+
+    if (!role || typeof role !== "string") {
+      return res.status(400).json({ error: "role is required." });
+    }
+
+    const cleanRole = sanitizeInput(role);
+    const cleanContext = context ? sanitizeInput(context) : "";
+    const allowedTypes = ["experience", "project"];
+
+    if (!allowedTypes.includes(type)) {
+      return res.status(400).json({ error: "type must be one of: experience, project." });
+    }
+
+    const typeLabel = type === "project" ? "project" : "professional role";
+
+    const prompt = `You are a professional resume writer. Suggest 5-8 strong achievement bullet points for this ${typeLabel}. Each bullet should start with a strong action verb, be concise, and highlight impact where possible.
+
+Role/Project: ${cleanRole}
+${cleanContext ? `Context: ${cleanContext}` : ""}
+
+Rules:
+- Return 5-8 bullet points
+- Each bullet should be one line
+- Start each with a strong action verb
+- Focus on impact and results, not just responsibilities
+- Make them specific and actionable
+- Return ONLY a JSON object: {"suggestions": ["string", "string", ...]}`;
+
+    const response = await generateJson(prompt);
+
+    if (!response || typeof response !== "object") {
+      return res.status(502).json({ error: "Failed to parse AI response." });
+    }
+
+    if (!response.suggestions || !Array.isArray(response.suggestions)) {
+      return res.status(502).json({ error: "AI response missing suggestions array." });
+    }
+
+    const validSuggestions = response.suggestions.filter(s => typeof s === "string" && s.trim().length > 0);
+
+    return res.json({
+      suggestions: validSuggestions
+    });
+  } catch (error) {
+    console.error("Suggest achievements error:", error);
+    if (error.message && error.message.includes("invalid JSON")) {
+      return res.status(502).json({ error: "AI returned an invalid response. Please try again." });
+    }
+    return res.status(500).json({ error: "Failed to suggest achievements. Please try again later." });
+  }
+}
+
 module.exports = {
   improveBullet,
   fixGrammar,
+  suggestAchievements,
   generateSummary,
   generateCoverLetter
 };

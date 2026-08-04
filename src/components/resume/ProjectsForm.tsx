@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import { FormSection, EntryCard, FieldRow } from "@/components/resume/FormSection";
 import { AiImproveButton } from "@/components/common/AiImproveButton";
 import { AiGrammarButton } from "@/components/common/AiGrammarButton";
+import { AiSuggestButton } from "@/components/common/AiSuggestButton";
 import type { ProjectEntry } from "@/types/resume";
 import { generateId } from "@/utils/generateId";
+import { Plus, Trash2 } from "lucide-react";
 
 type ProjectsFormProps = {
   data: ProjectEntry[];
@@ -14,16 +18,35 @@ export function ProjectsForm({ data, onChange }: ProjectsFormProps) {
   function add() {
     onChange([
       ...data,
-      { id: generateId(), name: "", description: "", technologies: "", link: "", startDate: "", endDate: "" }
+      { id: generateId(), name: "", description: "", technologies: "", link: "", startDate: "", endDate: "", bullets: [] }
     ]);
   }
 
-  function update(id: string, field: keyof ProjectEntry, value: string) {
+  function update(id: string, field: keyof ProjectEntry, value: string | string[]) {
     onChange(data.map((e) => (e.id === id ? { ...e, [field]: value } : e)));
   }
 
   function remove(id: string) {
     onChange(data.filter((e) => e.id !== id));
+  }
+
+  function addBullet(id: string, bullet: string) {
+    onChange(data.map((e) => {
+      if (e.id === id) {
+        const currentBullets = Array.isArray(e.bullets) ? e.bullets : [];
+        return { ...e, bullets: [...currentBullets, bullet] };
+      }
+      return e;
+    }));
+  }
+
+  function removeBullet(id: string, bulletIndex: number) {
+    onChange(data.map((e) => {
+      if (e.id === id && Array.isArray(e.bullets)) {
+        return { ...e, bullets: e.bullets.filter((_, i) => i !== bulletIndex) };
+      }
+      return e;
+    }));
   }
 
   return (
@@ -79,6 +102,51 @@ export function ProjectsForm({ data, onChange }: ProjectsFormProps) {
               value={entry.endDate}
             />
           </FieldRow>
+
+          {/* Project bullets section */}
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Key contributions</p>
+            {Array.isArray(entry.bullets) && entry.bullets.map((bullet, bi) => (
+              <div key={bi} className="flex gap-2">
+                <Input
+                  aria-label={`Contribution ${bi + 1}`}
+                  className="flex-1"
+                  onChange={(e) => {
+                    const newBullets = [...(Array.isArray(entry.bullets) ? entry.bullets : [])];
+                    newBullets[bi] = e.target.value;
+                    update(entry.id, "bullets", newBullets);
+                  }}
+                  placeholder={`Key contribution ${bi + 1}`}
+                  value={bullet}
+                />
+                <Button
+                  onClick={() => removeBullet(entry.id, bi)}
+                  size="sm"
+                  type="button"
+                  variant="ghost"
+                >
+                  <Trash2 size={14} className="text-red-500" />
+                </Button>
+              </div>
+            ))}
+            <div className="flex gap-2">
+              <Button
+                onClick={() => addBullet(entry.id, "")}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                <Plus size={14} />
+                Add contribution
+              </Button>
+              <AiSuggestButton
+                role={entry.name}
+                context={`${entry.description}. Technologies: ${entry.technologies}`}
+                type="project"
+                onInsert={(bullet) => addBullet(entry.id, bullet)}
+              />
+            </div>
+          </div>
         </EntryCard>
       ))}
     </FormSection>

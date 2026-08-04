@@ -57,6 +57,7 @@ export type ProjectEntry = {
   link: string;
   startDate: string;
   endDate: string;
+  bullets: string[];
 };
 
 export type SkillEntry = {

@@ -1,5 +1,5 @@
 const express = require("express");
-const { generateCoverLetter, generateSummary, improveBullet, fixGrammar } = require("../controllers/aiController");
+const { generateCoverLetter, generateSummary, improveBullet, fixGrammar, suggestAchievements } = require("../controllers/aiController");
 const { validateBody, validateObject, validateString, validateEnum } = require("../middleware/validate");
 
 const router = express.Router();
@@ -20,6 +20,16 @@ router.post(
     text: (value) => validateString(value, "text", { maxLength: 5000 })
   }),
   fixGrammar
+);
+
+router.post(
+  "/suggest-achievements",
+  validateBody({
+    role: (value) => validateString(value, "role", { maxLength: 500 }),
+    context: (value) => validateString(value, "context", { required: false, maxLength: 5000 }),
+    type: (value) => validateEnum(value, "type", ["experience", "project"], { required: false })
+  }),
+  suggestAchievements
 );
 
 router.post(

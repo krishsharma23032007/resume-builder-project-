@@ -20,6 +20,16 @@ interface FixGrammarResponse {
   changes: string;
 }
 
+interface SuggestAchievementsPayload {
+  role: string;
+  context?: string;
+  type?: "experience" | "project";
+}
+
+interface SuggestAchievementsResponse {
+  suggestions: string[];
+}
+
 interface GenerateSummaryPayload {
   resumeContent: string;
 }
@@ -43,6 +53,9 @@ export const aiService = {
 
   fixGrammar: (payload: FixGrammarPayload) =>
     api.post<FixGrammarResponse>("/ai/grammar", payload),
+
+  suggestAchievements: (payload: SuggestAchievementsPayload) =>
+    api.post<SuggestAchievementsResponse>("/ai/suggest-achievements", payload),
 
   generateSummary: (payload: GenerateSummaryPayload) =>
     api.post<GenerateSummaryResponse>("/ai/summary", payload),
