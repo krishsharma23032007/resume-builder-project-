@@ -11,6 +11,15 @@ interface ImproveBulletResponse {
   explanation: string;
 }
 
+interface FixGrammarPayload {
+  text: string;
+}
+
+interface FixGrammarResponse {
+  corrected: string;
+  changes: string;
+}
+
 interface GenerateSummaryPayload {
   resumeContent: string;
 }
@@ -31,6 +40,9 @@ interface GenerateCoverLetterResponse {
 export const aiService = {
   improveBullet: (payload: ImproveBulletPayload) =>
     api.post<ImproveBulletResponse>("/ai/improve", payload),
+
+  fixGrammar: (payload: FixGrammarPayload) =>
+    api.post<FixGrammarResponse>("/ai/grammar", payload),
 
   generateSummary: (payload: GenerateSummaryPayload) =>
     api.post<GenerateSummaryResponse>("/ai/summary", payload),

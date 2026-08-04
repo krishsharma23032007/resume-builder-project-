@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { FormSection, EntryCard, FieldRow } from "@/components/resume/FormSection";
 import { AiImproveButton } from "@/components/common/AiImproveButton";
+import { AiGrammarButton } from "@/components/common/AiGrammarButton";
 import type { ExperienceEntry } from "@/types/resume";
 import { generateId } from "@/utils/generateId";
 import { Plus, Trash2 } from "lucide-react";
@@ -130,6 +131,10 @@ export function ExperienceForm({ data, onChange }: ExperienceFormProps) {
                   context={entry.description}
                   jobTitle={entry.title}
                   onAccept={(improved) => updateBullet(entry.id, bi, improved)}
+                />
+                <AiGrammarButton
+                  text={bullet}
+                  onAccept={(corrected) => updateBullet(entry.id, bi, corrected)}
                 />
               </div>
             ))}

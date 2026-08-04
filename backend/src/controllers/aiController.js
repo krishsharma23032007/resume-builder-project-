@@ -245,8 +245,68 @@ Return only the cover letter text.`;
   }
 }
 
+async function fixGrammar(req, res) {
+  try {
+    const { text } = req.body;
+
+    if (!text || typeof text !== "string") {
+      return res.status(400).json({ error: "text is required." });
+    }
+
+    const trimmed = text.trim();
+    if (trimmed.length < 5) {
+      return res.status(400).json({ error: "text must be at least 5 characters." });
+    }
+
+    if (trimmed.length > 5000) {
+      return res.status(400).json({ error: "text must be 5000 characters or less." });
+    }
+
+    const cleanText = sanitizeInput(text);
+
+    const prompt = `You are a professional proofreader. Fix all grammar, spelling, and punctuation errors in the following text. Improve clarity and flow while preserving the original meaning and professional tone.
+
+Original text:
+${cleanText}
+
+Rules:
+- Fix grammar, spelling, and punctuation errors
+- Improve sentence structure and clarity
+- Maintain the original meaning and intent
+- Keep the same tone and style
+- Do not add new content or change the message
+- Return ONLY a JSON object: {"corrected": "string", "changes": "string"}`;
+
+    const response = await generateJson(prompt);
+
+    if (!response || typeof response !== "object") {
+      return res.status(502).json({ error: "Failed to parse AI response." });
+    }
+
+    if (!response.corrected || typeof response.corrected !== "string") {
+      return res.status(502).json({ error: "AI response missing corrected text." });
+    }
+
+    if (!response.changes || typeof response.changes !== "string") {
+      return res.status(502).json({ error: "AI response missing changes explanation." });
+    }
+
+    return res.json({
+      corrected: response.corrected,
+      changes: response.changes
+    });
+  } catch (error) {
+    console.error("Fix grammar error:", error);
+    if (error.message && error.message.includes("invalid JSON")) {
+      return res.status(502).json({ error: "AI returned an invalid response. Please try again." });
+    }
+    return res.status(500).json({ error: "Failed to fix grammar. Please try again later." });
+  }
+}
+
 module.exports = {
   improveBullet,
+  fixGrammar,
   generateSummary,
   generateCoverLetter
 };

@@ -1,5 +1,5 @@
 const express = require("express");
-const { generateCoverLetter, generateSummary, improveBullet } = require("../controllers/aiController");
+const { generateCoverLetter, generateSummary, improveBullet, fixGrammar } = require("../controllers/aiController");
 const { validateBody, validateObject, validateString, validateEnum } = require("../middleware/validate");
 
 const router = express.Router();
@@ -12,6 +12,14 @@ router.post(
     jobTitle: (value) => validateString(value, "jobTitle", { required: false, maxLength: 200 })
   }),
   improveBullet
+);
+
+router.post(
+  "/grammar",
+  validateBody({
+    text: (value) => validateString(value, "text", { maxLength: 5000 })
+  }),
+  fixGrammar
 );
 
 router.post(

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { FormSection } from "@/components/resume/FormSection";
+import { AiImproveButton } from "@/components/common/AiImproveButton";
+import { AiGrammarButton } from "@/components/common/AiGrammarButton";
 import { aiService } from "@/services/aiService";
 import type { ResumeProfile } from "@/types/resume";
 import { Sparkles, Loader2 } from "lucide-react";
@@ -91,6 +93,10 @@ export function PersonalInfoForm({ data, onChange, resumeData }: PersonalInfoFor
             )}
             {summaryLoading ? "Generating..." : "Generate Summary"}
           </Button>
+          <AiGrammarButton
+            text={data.summary}
+            onAccept={(corrected) => update("summary", corrected)}
+          />
           {summaryError && <span className="text-xs text-red-500">{summaryError}</span>}
         </div>
       </div>
