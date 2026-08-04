@@ -43,9 +43,23 @@ function parseJsonResponse(text) {
   } catch (_) {
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) {
+      const trimmed = text.trim();
+      if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+        try {
+          return JSON.parse(trimmed);
+        } catch (_) {}
+      }
       throw new Error("Gemini returned an invalid JSON response.");
     }
-    return JSON.parse(match[0]);
+    try {
+      return JSON.parse(match[0]);
+    } catch (_) {
+      const cleaned = match[0]
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+        .replace(/,\s*}/g, "}")
+        .replace(/,\s*]/g, "]");
+      return JSON.parse(cleaned);
+    }
   }
 }
 

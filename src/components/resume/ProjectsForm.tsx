@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/Input";
 import { FormSection, EntryCard, FieldRow } from "@/components/resume/FormSection";
+import { AiImproveButton } from "@/components/common/AiImproveButton";
 import type { ProjectEntry } from "@/types/resume";
 import { generateId } from "@/utils/generateId";
 
@@ -41,6 +42,11 @@ export function ProjectsForm({ data, onChange }: ProjectsFormProps) {
             onChange={(e) => update(entry.id, "description", e.target.value)}
             placeholder="What does this project do?"
             value={entry.description}
+          />
+          <AiImproveButton
+            bullet={entry.description}
+            context={`Project: ${entry.name}. Technologies: ${entry.technologies}`}
+            onAccept={(improved) => update(entry.id, "description", improved)}
           />
           <Input
             aria-label="Technologies"

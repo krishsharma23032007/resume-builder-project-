@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/Input";
 import { FormSection, EntryCard, FieldRow } from "@/components/resume/FormSection";
+import { AiImproveButton } from "@/components/common/AiImproveButton";
 import type { ResponsibilityEntry } from "@/types/resume";
 import { generateId } from "@/utils/generateId";
 
@@ -63,6 +64,11 @@ export function ResponsibilitiesForm({ data, onChange }: ResponsibilitiesFormPro
             onChange={(e) => update(entry.id, "description", e.target.value)}
             placeholder="What did you do in this role?"
             value={entry.description}
+          />
+          <AiImproveButton
+            bullet={entry.description}
+            context={`Role: ${entry.role} at ${entry.organization}`}
+            onAccept={(improved) => update(entry.id, "description", improved)}
           />
         </EntryCard>
       ))}

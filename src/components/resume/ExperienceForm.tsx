@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { FormSection, EntryCard, FieldRow } from "@/components/resume/FormSection";
+import { AiImproveButton } from "@/components/common/AiImproveButton";
 import type { ExperienceEntry } from "@/types/resume";
 import { generateId } from "@/utils/generateId";
 import { Plus, Trash2 } from "lucide-react";
@@ -104,24 +105,32 @@ export function ExperienceForm({ data, onChange }: ExperienceFormProps) {
           <div className="space-y-2">
             <p className="text-sm font-medium">Bullet points</p>
             {entry.bullets.map((bullet, bi) => (
-              <div key={bi} className="flex gap-2">
-                <Input
-                  aria-label={`Bullet ${bi + 1}`}
-                  className="flex-1"
-                  onChange={(e) => updateBullet(entry.id, bi, e.target.value)}
-                  placeholder={`Achievement or responsibility ${bi + 1}`}
-                  value={bullet}
+              <div key={bi} className="space-y-1">
+                <div className="flex gap-2">
+                  <Input
+                    aria-label={`Bullet ${bi + 1}`}
+                    className="flex-1"
+                    onChange={(e) => updateBullet(entry.id, bi, e.target.value)}
+                    placeholder={`Achievement or responsibility ${bi + 1}`}
+                    value={bullet}
+                  />
+                  {entry.bullets.length > 1 && (
+                    <Button
+                      onClick={() => removeBullet(entry.id, bi)}
+                      size="sm"
+                      type="button"
+                      variant="ghost"
+                    >
+                      <Trash2 size={14} className="text-red-500" />
+                    </Button>
+                  )}
+                </div>
+                <AiImproveButton
+                  bullet={bullet}
+                  context={entry.description}
+                  jobTitle={entry.title}
+                  onAccept={(improved) => updateBullet(entry.id, bi, improved)}
                 />
-                {entry.bullets.length > 1 && (
-                  <Button
-                    onClick={() => removeBullet(entry.id, bi)}
-                    size="sm"
-                    type="button"
-                    variant="ghost"
-                  >
-                    <Trash2 size={14} className="text-red-500" />
-                  </Button>
-                )}
               </div>
             ))}
             <Button onClick={() => addBullet(entry.id)} size="sm" type="button" variant="outline">

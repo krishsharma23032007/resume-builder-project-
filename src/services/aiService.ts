@@ -2,10 +2,13 @@ import { api } from "./apiClient";
 
 interface ImproveBulletPayload {
   bullet: string;
+  context?: string;
+  jobTitle?: string;
 }
 
 interface ImproveBulletResponse {
-  improvedBullet: string;
+  improved: string;
+  explanation: string;
 }
 
 interface GenerateSummaryPayload {
