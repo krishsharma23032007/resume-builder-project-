@@ -16,7 +16,7 @@ export function AppLayout() {
   }
 
   return (
-    <div className="grid min-h-screen bg-muted/40 lg:grid-cols-[260px_1fr]">
+    <div className="grid min-h-screen bg-background lg:grid-cols-[260px_1fr]">
       <aside className="hidden border-r bg-card lg:block">
         <Link
           className="flex h-16 items-center gap-3 border-b-2 border-brutal-ink px-6 font-display font-extrabold hover:bg-muted"
