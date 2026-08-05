@@ -134,10 +134,15 @@ export const resumeService = {
   },
 
   async generatePdf(resumeData: ResumeData, template: string = "classic"): Promise<Blob> {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"}/api/pdf/generate`, {
+    const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "https://ai-resume-backend-pknw.onrender.com").replace(/\/$/, "");
+    const { auth } = await import("@/lib/firebase");
+    const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+
+    const response = await fetch(`${apiBaseUrl}/api/pdf/generate`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
       },
       body: JSON.stringify({ resumeData, template })
     });

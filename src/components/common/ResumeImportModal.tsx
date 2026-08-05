@@ -12,43 +12,23 @@ type ResumeImportModalProps = {
 
 export function ResumeImportModal({ onImport, onClose }: ResumeImportModalProps) {
   const [file, setFile] = useState<File | null>(null);
-  const [extractedText, setExtractedText] = useState("");
   const [parsedData, setParsedData] = useState<ParseResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [step, setStep] = useState<"upload" | "preview" | "confirm">("upload");
+  const [step, setStep] = useState<"upload" | "confirm">("upload");
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
-  async function handleExtractText() {
+  async function handleExtractAndParse() {
     if (!file) return;
     setLoading(true);
     setError("");
 
     try {
-      // Use pdf.js or similar to extract text from PDF
-      // For now, we'll use a simple approach - send the file to the analyze endpoint
-      // which already extracts text
-      const analysis = await resumeService.analyzeResume(file);
-      setExtractedText(analysis.extractedText);
-      setStep("preview");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to extract text from PDF");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleParse() {
-    if (!extractedText.trim()) return;
-    setLoading(true);
-    setError("");
-
-    try {
-      const result = await resumeService.parseResume(extractedText);
+      const result = await resumeService.parseResumePdf(file);
       setParsedData(result.parsed);
       setStep("confirm");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to parse resume");
+      setError(err instanceof Error ? err.message : "Failed to parse resume PDF");
     } finally {
       setLoading(false);
     }
@@ -125,36 +105,7 @@ export function ResumeImportModal({ onImport, onClose }: ResumeImportModalProps)
                 </Button>
                 <Button
                   disabled={!file || loading}
-                  onClick={handleExtractText}
-                  size="sm"
-                  type="button"
-                >
-                  {loading ? <Loader2 size={14} className="animate-spin" /> : <FileText size={14} />}
-                  {loading ? "Extracting..." : "Extract Text"}
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {step === "preview" && (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Review the extracted text below, then click Parse to structure the data.
-              </p>
-
-              <div className="max-h-64 overflow-y-auto rounded-lg border-2 border-brutal-ink bg-background p-3 text-xs leading-5">
-                {extractedText || "No text extracted."}
-              </div>
-
-              {error && <p className="text-sm text-red-600">{error}</p>}
-
-              <div className="flex justify-end gap-2">
-                <Button onClick={() => setStep("upload")} size="sm" type="button" variant="outline">
-                  Back
-                </Button>
-                <Button
-                  disabled={!extractedText.trim() || loading}
-                  onClick={handleParse}
+                  onClick={handleExtractAndParse}
                   size="sm"
                   type="button"
                 >
@@ -268,7 +219,7 @@ export function ResumeImportModal({ onImport, onClose }: ResumeImportModalProps)
               {error && <p className="text-sm text-red-600">{error}</p>}
 
               <div className="flex justify-end gap-2">
-                <Button onClick={() => setStep("preview")} size="sm" type="button" variant="outline">
+                <Button onClick={() => setStep("upload")} size="sm" type="button" variant="outline">
                   Back
                 </Button>
                 <Button onClick={handleImport} size="sm" type="button">

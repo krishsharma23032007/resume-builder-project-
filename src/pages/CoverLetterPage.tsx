@@ -31,7 +31,12 @@ export function CoverLetterPage() {
     experience: resumeData.experience,
     education: resumeData.education,
     skills: resumeData.skills,
-    projects: resumeData.projects
+    projects: resumeData.projects,
+    certifications: resumeData.certifications,
+    achievements: resumeData.achievements,
+    responsibilities: resumeData.responsibilities,
+    languages: resumeData.languages,
+    interests: resumeData.interests
   };
 
   async function handleGenerate() {
