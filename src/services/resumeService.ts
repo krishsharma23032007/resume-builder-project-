@@ -127,6 +127,12 @@ export const resumeService = {
     return api.post("/api/ai/parse", { text });
   },
 
+  async parseResumePdf(file: File): Promise<{ parsed: ParseResult }> {
+    const formData = new FormData();
+    formData.append("resume", file);
+    return api.post("/api/analyze/parse", formData);
+  },
+
   async generatePdf(resumeData: ResumeData, template: string = "classic"): Promise<Blob> {
     const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"}/api/pdf/generate`, {
       method: "POST",
