@@ -359,10 +359,155 @@ Rules:
   }
 }
 
+async function parseResume(req, res) {
+  try {
+    const { text } = req.body;
+
+    if (!text || typeof text !== "string") {
+      return res.status(400).json({ error: "text is required." });
+    }
+
+    const trimmed = text.trim();
+    if (trimmed.length < 50) {
+      return res.status(400).json({ error: "Resume text too short to parse." });
+    }
+
+    if (trimmed.length > 20000) {
+      return res.status(400).json({ error: "Resume text too long. Maximum 20000 characters." });
+    }
+
+    const prompt = `You are an expert resume parser. Extract structured data from this resume text and return it as a JSON object.
+
+Resume text:
+${trimmed}
+
+Return ONLY a JSON object with this exact structure:
+{
+  "personal": {
+    "name": "string",
+    "role": "string",
+    "location": "string",
+    "email": "string",
+    "phone": "string",
+    "summary": "string"
+  },
+  "education": [
+    {
+      "institution": "string",
+      "degree": "string",
+      "field": "string",
+      "startDate": "YYYY-MM",
+      "endDate": "YYYY-MM",
+      "gpa": "string"
+    }
+  ],
+  "experience": [
+    {
+      "company": "string",
+      "title": "string",
+      "location": "string",
+      "startDate": "YYYY-MM",
+      "endDate": "YYYY-MM",
+      "description": "string",
+      "bullets": ["string"]
+    }
+  ],
+  "projects": [
+    {
+      "name": "string",
+      "description": "string",
+      "technologies": "string",
+      "link": "string",
+      "startDate": "YYYY-MM",
+      "endDate": "YYYY-MM",
+      "bullets": ["string"]
+    }
+  ],
+  "skills": [
+    {
+      "category": "string",
+      "items": ["string"]
+    }
+  ],
+  "certifications": [
+    {
+      "name": "string",
+      "issuer": "string",
+      "date": "YYYY-MM",
+      "link": "string"
+    }
+  ],
+  "achievements": [
+    {
+      "title": "string",
+      "description": "string",
+      "date": "YYYY-MM"
+    }
+  ],
+  "languages": [
+    {
+      "name": "string",
+      "proficiency": "beginner|elementary|intermediate|advanced|native"
+    }
+  ],
+  "interests": [
+    {
+      "name": "string"
+    }
+  ]
+}
+
+Rules:
+- Extract all information you can find
+- Use empty strings for missing fields
+- Use empty arrays for missing sections
+- Dates should be in YYYY-MM format when possible
+- For skills, group by category (e.g., "Programming Languages", "Tools", etc.)
+- For proficiency, infer from context or default to "intermediate"
+- Do not add information not present in the resume
+- Return ONLY the JSON object, no other text`;
+
+    const response = await generateJson(prompt);
+
+    if (!response || typeof response !== "object") {
+      return res.status(502).json({ error: "Failed to parse AI response." });
+    }
+
+    // Ensure all required fields exist with defaults
+    const parsed = {
+      personal: {
+        name: response.personal?.name || "",
+        role: response.personal?.role || "",
+        location: response.personal?.location || "",
+        email: response.personal?.email || "",
+        phone: response.personal?.phone || "",
+        summary: response.personal?.summary || ""
+      },
+      education: Array.isArray(response.education) ? response.education : [],
+      experience: Array.isArray(response.experience) ? response.experience : [],
+      projects: Array.isArray(response.projects) ? response.projects : [],
+      skills: Array.isArray(response.skills) ? response.skills : [],
+      certifications: Array.isArray(response.certifications) ? response.certifications : [],
+      achievements: Array.isArray(response.achievements) ? response.achievements : [],
+      languages: Array.isArray(response.languages) ? response.languages : [],
+      interests: Array.isArray(response.interests) ? response.interests : []
+    };
+
+    return res.json({ parsed });
+  } catch (error) {
+    console.error("Parse resume error:", error);
+    if (error.message && error.message.includes("invalid JSON")) {
+      return res.status(502).json({ error: "AI returned an invalid response. Please try again." });
+    }
+    return res.status(500).json({ error: "Failed to parse resume. Please try again later." });
+  }
+}
+
 module.exports = {
   improveBullet,
   fixGrammar,
   suggestAchievements,
+  parseResume,
   generateSummary,
   generateCoverLetter
 };

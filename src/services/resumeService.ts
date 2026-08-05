@@ -35,6 +35,65 @@ export interface CoverLetterResult {
   tone: string;
 }
 
+export interface ParseResult {
+  personal: {
+    name: string;
+    role: string;
+    location: string;
+    email: string;
+    phone: string;
+    summary: string;
+  };
+  education: Array<{
+    institution: string;
+    degree: string;
+    field: string;
+    startDate: string;
+    endDate: string;
+    gpa: string;
+  }>;
+  experience: Array<{
+    company: string;
+    title: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+    bullets: string[];
+  }>;
+  projects: Array<{
+    name: string;
+    description: string;
+    technologies: string;
+    link: string;
+    startDate: string;
+    endDate: string;
+    bullets: string[];
+  }>;
+  skills: Array<{
+    category: string;
+    items: string[];
+  }>;
+  certifications: Array<{
+    name: string;
+    issuer: string;
+    date: string;
+    link: string;
+  }>;
+  achievements: Array<{
+    title: string;
+    description: string;
+    date: string;
+  }>;
+  languages: Array<{
+    name: string;
+    proficiency: string;
+  }>;
+  interests: Array<{
+    name: string;
+  }>;
+}
+
 export const resumeService = {
   async analyzeResume(file: File): Promise<AnalyzeResult> {
     const formData = new FormData();
@@ -62,6 +121,10 @@ export const resumeService = {
     jobTitle?: string
   ): Promise<CoverLetterResult> {
     return api.post("/api/ai/cover-letter", { resumeData, jobDescription, tone, company, jobTitle });
+  },
+
+  async parseResume(text: string): Promise<{ parsed: ParseResult }> {
+    return api.post("/api/ai/parse", { text });
   },
 
   async generatePdf(resumeData: ResumeData, template: string = "classic"): Promise<Blob> {

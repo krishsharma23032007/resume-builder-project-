@@ -1,4 +1,4 @@
-import { BriefcaseBusiness, FileText, Save, Sparkles, UploadCloud } from "lucide-react";
+import { BriefcaseBusiness, FileText, Save, Sparkles, UploadCloud, Download } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -16,13 +16,16 @@ import { LanguagesForm } from "@/components/resume/LanguagesForm";
 import { InterestsForm } from "@/components/resume/InterestsForm";
 import { SectionOrder } from "@/components/resume/SectionOrder";
 import { ResumePreview } from "@/components/resume/ResumePreview";
+import { ResumeImportModal } from "@/components/common/ResumeImportModal";
 import {
   resumeService,
   type AnalyzeResult,
   type ImproveResult,
-  type MatchResult
+  type MatchResult,
+  type ParseResult
 } from "@/services/resumeService";
 import { useState } from "react";
+import { generateId } from "@/utils/generateId";
 
 export function ResumeBuilderPage() {
   const {
@@ -52,6 +55,7 @@ export function ResumeBuilderPage() {
   const [improvement, setImprovement] = useState<ImproveResult | null>(null);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [toolError, setToolError] = useState("");
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const resumeDataForApi = {
     personalInfo: resumeData.personal,
@@ -75,6 +79,90 @@ export function ResumeBuilderPage() {
     } finally {
       setLoadingAction(null);
     }
+  }
+
+  function handleImportResume(data: ParseResult) {
+    // Import personal info
+    updatePersonal({
+      name: data.personal.name,
+      role: data.personal.role,
+      location: data.personal.location,
+      email: data.personal.email,
+      phone: data.personal.phone,
+      summary: data.personal.summary
+    });
+
+    // Import education
+    updateEducation(data.education.map(edu => ({
+      id: generateId(),
+      institution: edu.institution,
+      degree: edu.degree,
+      field: edu.field,
+      startDate: edu.startDate,
+      endDate: edu.endDate,
+      gpa: edu.gpa
+    })));
+
+    // Import experience
+    updateExperience(data.experience.map(exp => ({
+      id: generateId(),
+      company: exp.company,
+      title: exp.title,
+      location: exp.location,
+      startDate: exp.startDate,
+      endDate: exp.endDate,
+      description: exp.description,
+      bullets: exp.bullets
+    })));
+
+    // Import projects
+    updateProjects(data.projects.map(proj => ({
+      id: generateId(),
+      name: proj.name,
+      description: proj.description,
+      technologies: proj.technologies,
+      link: proj.link,
+      startDate: proj.startDate,
+      endDate: proj.endDate,
+      bullets: proj.bullets || []
+    })));
+
+    // Import skills
+    updateSkills(data.skills.map(skill => ({
+      id: generateId(),
+      category: skill.category,
+      items: skill.items
+    })));
+
+    // Import certifications
+    updateCertifications(data.certifications.map(cert => ({
+      id: generateId(),
+      name: cert.name,
+      issuer: cert.issuer,
+      date: cert.date,
+      link: cert.link
+    })));
+
+    // Import achievements
+    updateAchievements(data.achievements.map(ach => ({
+      id: generateId(),
+      title: ach.title,
+      description: ach.description,
+      date: ach.date
+    })));
+
+    // Import languages
+    updateLanguages(data.languages.map(lang => ({
+      id: generateId(),
+      name: lang.name,
+      proficiency: lang.proficiency as "beginner" | "elementary" | "intermediate" | "advanced" | "native"
+    })));
+
+    // Import interests
+    updateInterests(data.interests.map(interest => ({
+      id: generateId(),
+      name: interest.name
+    })));
   }
 
   function renderSection(key: string) {
@@ -116,7 +204,17 @@ export function ResumeBuilderPage() {
           </div>
           <p className="mt-1 text-xs text-muted-foreground">Analyze and improve your resume.</p>
         </Card>
-        <div className="sticky top-4">
+        <div className="sticky top-4 space-y-2">
+          <Button
+            className="w-full"
+            onClick={() => setShowImportModal(true)}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            <Download size={16} />
+            Import Resume
+          </Button>
           <Button
             className="w-full"
             disabled={saveStatus === "saving"}
@@ -268,6 +366,14 @@ export function ResumeBuilderPage() {
       <aside className="rounded-lg border bg-card p-5 flex flex-col">
         <ResumePreview data={resumeData} />
       </aside>
+
+      {/* Import Modal */}
+      {showImportModal && (
+        <ResumeImportModal
+          onImport={handleImportResume}
+          onClose={() => setShowImportModal(false)}
+        />
+      )}
     </div>
   );
 }

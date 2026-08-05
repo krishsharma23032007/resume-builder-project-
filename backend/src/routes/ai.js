@@ -1,5 +1,5 @@
 const express = require("express");
-const { generateCoverLetter, generateSummary, improveBullet, fixGrammar, suggestAchievements } = require("../controllers/aiController");
+const { generateCoverLetter, generateSummary, improveBullet, fixGrammar, suggestAchievements, parseResume } = require("../controllers/aiController");
 const { validateBody, validateObject, validateString, validateEnum } = require("../middleware/validate");
 
 const router = express.Router();
@@ -30,6 +30,14 @@ router.post(
     type: (value) => validateEnum(value, "type", ["experience", "project"], { required: false })
   }),
   suggestAchievements
+);
+
+router.post(
+  "/parse",
+  validateBody({
+    text: (value) => validateString(value, "text", { maxLength: 20000 })
+  }),
+  parseResume
 );
 
 router.post(
