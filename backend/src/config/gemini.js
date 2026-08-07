@@ -1,40 +1,48 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const BASE_URL = process.env.MIMO_API_BASE_URL || "https://token-plan-sgp.xiaomimimo.com/v1";
+const MODEL_NAME = process.env.MIMO_MODEL || "mimo-v2.5-pro";
 
-const MODEL_NAME = "gemini-2.5-flash";
-
-function getGeminiModel(options = {}) {
-  const apiKey = process.env.GEMINI_API_KEY;
-
+async function callApi(messages, options = {}) {
+  const apiKey = process.env.MIMO_API_KEY;
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is missing.");
+    throw new Error("MIMO_API_KEY is missing.");
   }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const generationConfig = {
-    temperature: 0.4
+  const body = {
+    model: MODEL_NAME,
+    messages,
+    temperature: 0.4,
+    max_tokens: 4096
   };
 
   if (options.json) {
-    generationConfig.responseMimeType = "application/json";
+    body.response_format = { type: "json_object" };
   }
 
-  return genAI.getGenerativeModel({
-    model: MODEL_NAME,
-    generationConfig
+  const response = await fetch(`${BASE_URL}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(body)
   });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`API error ${response.status}: ${error}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
 }
 
 async function generateJson(prompt) {
-  const model = getGeminiModel({ json: true });
-  const result = await model.generateContent(prompt);
-  const text = result.response.text();
+  const text = await callApi([{ role: "user", content: prompt }], { json: true });
   return parseJsonResponse(text);
 }
 
 async function generateText(prompt) {
-  const model = getGeminiModel();
-  const result = await model.generateContent(prompt);
-  return result.response.text().trim();
+  return callApi([{ role: "user", content: prompt }]);
 }
 
 function parseJsonResponse(text) {
@@ -49,7 +57,7 @@ function parseJsonResponse(text) {
           return JSON.parse(trimmed);
         } catch (_) {}
       }
-      throw new Error("Gemini returned an invalid JSON response.");
+      throw new Error("AI returned an invalid JSON response.");
     }
     try {
       return JSON.parse(match[0]);
