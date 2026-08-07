@@ -6,4 +6,6 @@ work/
 backend/node_modules
 backend/.env
 dist/
+.DS_Store
+.mimocode/
 
