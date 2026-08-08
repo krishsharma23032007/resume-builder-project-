@@ -12,7 +12,7 @@ export function SettingsPage() {
         <Card>
           <h2 className="font-semibold">Profile</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <Input defaultValue={user?.displayName || ""} aria-label="Name" readOnly />
+            <Input defaultValue={user?.name || ""} aria-label="Name" readOnly />
             <Input defaultValue={user?.email || ""} aria-label="Email" readOnly />
           </div>
         </Card>
