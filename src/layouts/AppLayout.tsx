@@ -1,16 +1,14 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { FileText, BriefcaseBusiness, Sparkles, LogOut, ChevronDown, ChevronRight } from "lucide-react";
+import { FileText, BriefcaseBusiness, Sparkles, LogOut } from "lucide-react";
 import { appNavigation } from "@/data/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { GuruBadgeLogo } from "@/components/common/GuruBadgeLogo";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 export function AppLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [expandedTool, setExpandedTool] = useState<string | null>(null);
 
   async function handleLogout() {
     await logout();
@@ -48,59 +46,44 @@ export function AppLayout() {
           <div className="mt-4 pt-4 border-t">
             <p className="px-3 mb-2 text-xs font-semibold uppercase text-muted-foreground">Resume Tools</p>
 
-            <button
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-              onClick={() => setExpandedTool(expandedTool === "ats" ? null : "ats")}
-              type="button"
+            <NavLink
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
+                  { "bg-muted text-foreground": isActive }
+                )
+              }
+              to="/ats-analysis"
             >
               <FileText size={18} />
-              <span className="flex-1 text-left">ATS Analysis</span>
-              {expandedTool === "ats" ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </button>
-            {expandedTool === "ats" && (
-              <div className="ml-6 mr-2 mb-2 rounded-lg border bg-background p-2 text-xs">
-                <p className="text-muted-foreground">Upload a PDF resume to analyze ATS compatibility.</p>
-                <Link to="/resume/new">
-                  <Button size="sm" variant="outline" className="mt-2 w-full">Go to Builder</Button>
-                </Link>
-              </div>
-            )}
+              ATS Analysis
+            </NavLink>
 
-            <button
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-              onClick={() => setExpandedTool(expandedTool === "match" ? null : "match")}
-              type="button"
+            <NavLink
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
+                  { "bg-muted text-foreground": isActive }
+                )
+              }
+              to="/job-match"
             >
               <BriefcaseBusiness size={18} />
-              <span className="flex-1 text-left">Job Match</span>
-              {expandedTool === "match" ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </button>
-            {expandedTool === "match" && (
-              <div className="ml-6 mr-2 mb-2 rounded-lg border bg-background p-2 text-xs">
-                <p className="text-muted-foreground">Compare your resume against a job description.</p>
-                <Link to="/resume/new">
-                  <Button size="sm" variant="outline" className="mt-2 w-full">Go to Builder</Button>
-                </Link>
-              </div>
-            )}
+              Job Match
+            </NavLink>
 
-            <button
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-              onClick={() => setExpandedTool(expandedTool === "bullet" ? null : "bullet")}
-              type="button"
+            <NavLink
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
+                  { "bg-muted text-foreground": isActive }
+                )
+              }
+              to="/improve-bullet"
             >
               <Sparkles size={18} />
-              <span className="flex-1 text-left">Improve Bullet</span>
-              {expandedTool === "bullet" ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </button>
-            {expandedTool === "bullet" && (
-              <div className="ml-6 mr-2 mb-2 rounded-lg border bg-background p-2 text-xs">
-                <p className="text-muted-foreground">Enhance your experience bullet points with AI.</p>
-                <Link to="/resume/new">
-                  <Button size="sm" variant="outline" className="mt-2 w-full">Go to Builder</Button>
-                </Link>
-              </div>
-            )}
+              Improve Bullet
+            </NavLink>
           </div>
         </nav>
 

@@ -1,9 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "@/layouts/AppLayout";
 import { MarketingLayout } from "@/layouts/MarketingLayout";
+import { ATSAnalysisPage } from "@/pages/ATSAnalysisPage";
 import { CoverLetterPage } from "@/pages/CoverLetterPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { ForgotPasswordPage } from "@/pages/ForgotPasswordPage";
+import { ImproveBulletPage } from "@/pages/ImproveBulletPage";
+import { JobMatchPage } from "@/pages/JobMatchPage";
 import { LandingPage } from "@/pages/LandingPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
@@ -32,7 +35,10 @@ export const router = createBrowserRouter([
       { path: "/resume/:id", element: <ResumeBuilderPage /> },
       { path: "/cover-letter", element: <CoverLetterPage /> },
       { path: "/templates", element: <TemplatesPage /> },
-      { path: "/settings", element: <SettingsPage /> }
+      { path: "/settings", element: <SettingsPage /> },
+      { path: "/ats-analysis", element: <ATSAnalysisPage /> },
+      { path: "/job-match", element: <JobMatchPage /> },
+      { path: "/improve-bullet", element: <ImproveBulletPage /> }
     ]
   },
   { path: "*", element: <NotFoundPage /> }
