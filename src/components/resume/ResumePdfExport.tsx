@@ -9,7 +9,7 @@ const colors = {
   white: "#ffffff"
 };
 
-type TemplateType = "classic" | "modern" | "compact";
+type TemplateType = "classic" | "modern" | "compact" | "executive" | "minimal" | "creative" | "technical";
 
 // Classic Template Styles
 const classicStyles = StyleSheet.create({
@@ -59,10 +59,78 @@ const compactStyles = StyleSheet.create({
   summary: { fontSize: 8, color: colors.gray, lineHeight: 1.3, marginBottom: 6 }
 });
 
+// Executive Template Styles
+const executiveStyles = StyleSheet.create({
+  page: { padding: 40, fontFamily: "Helvetica", fontSize: 10, color: colors.black },
+  header: { borderBottom: 2, borderBottomColor: "#1e3a5f", paddingBottom: 15, marginBottom: 20 },
+  name: { fontSize: 28, fontWeight: "bold", color: "#1e3a5f", marginBottom: 6 },
+  role: { fontSize: 14, color: colors.gray, marginBottom: 8 },
+  contact: { fontSize: 9, color: colors.lightGray, flexDirection: "row", gap: 12 },
+  section: { marginBottom: 16 },
+  sectionTitle: { fontSize: 12, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 2, color: "#1e3a5f", borderBottom: 1, borderBottomColor: "#1e3a5f", paddingBottom: 4, marginBottom: 8 },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 3 },
+  bold: { fontWeight: "bold", color: "#1e3a5f" },
+  text: { fontSize: 10, color: colors.gray, lineHeight: 1.5 },
+  bullet: { fontSize: 10, color: colors.gray, marginLeft: 12, marginBottom: 2 },
+  summary: { fontSize: 10, color: colors.gray, lineHeight: 1.6, marginBottom: 12 }
+});
+
+// Minimal Template Styles
+const minimalStyles = StyleSheet.create({
+  page: { padding: 35, fontFamily: "Helvetica", fontSize: 10, color: colors.black },
+  header: { marginBottom: 20 },
+  name: { fontSize: 24, fontWeight: "bold", marginBottom: 4 },
+  role: { fontSize: 12, color: colors.gray, marginBottom: 6 },
+  contact: { fontSize: 8, color: colors.lightGray, flexDirection: "row", gap: 10 },
+  section: { marginBottom: 14 },
+  sectionTitle: { fontSize: 11, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  bold: { fontWeight: "bold" },
+  text: { fontSize: 9, color: colors.gray, lineHeight: 1.4 },
+  bullet: { fontSize: 9, color: colors.gray, marginLeft: 10, marginBottom: 1 },
+  summary: { fontSize: 9, color: colors.gray, lineHeight: 1.5, marginBottom: 10 }
+});
+
+// Creative Template Styles
+const creativeStyles = StyleSheet.create({
+  page: { padding: 30, fontFamily: "Helvetica", fontSize: 10, color: colors.black },
+  header: { backgroundColor: "#ff6b6b", padding: 20, marginBottom: 20, borderRadius: 4 },
+  name: { fontSize: 24, fontWeight: "bold", color: colors.white, marginBottom: 4 },
+  role: { fontSize: 12, color: colors.white, marginBottom: 6 },
+  contact: { fontSize: 8, color: colors.white, flexDirection: "row", gap: 10 },
+  section: { marginBottom: 14 },
+  sectionTitle: { fontSize: 11, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 1, color: "#ff6b6b", borderBottom: 1, borderBottomColor: "#ff6b6b", paddingBottom: 3, marginBottom: 8 },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  bold: { fontWeight: "bold" },
+  text: { fontSize: 9, color: colors.gray, lineHeight: 1.4 },
+  bullet: { fontSize: 9, color: colors.gray, marginLeft: 10, marginBottom: 1 },
+  summary: { fontSize: 9, color: colors.gray, lineHeight: 1.5, marginBottom: 10 }
+});
+
+// Technical Template Styles
+const technicalStyles = StyleSheet.create({
+  page: { padding: 30, fontFamily: "Courier", fontSize: 9, color: colors.black },
+  header: { borderBottom: 1, borderBottomColor: colors.black, paddingBottom: 10, marginBottom: 15 },
+  name: { fontSize: 18, fontWeight: "bold", marginBottom: 4 },
+  role: { fontSize: 11, color: colors.gray, marginBottom: 6 },
+  contact: { fontSize: 8, color: colors.lightGray, flexDirection: "row", gap: 10 },
+  section: { marginBottom: 12 },
+  sectionTitle: { fontSize: 10, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 1, borderBottom: 0.5, borderBottomColor: colors.black, paddingBottom: 3, marginBottom: 6 },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  bold: { fontWeight: "bold" },
+  text: { fontSize: 8, color: colors.gray, lineHeight: 1.3 },
+  bullet: { fontSize: 8, color: colors.gray, marginLeft: 8, marginBottom: 0.5 },
+  summary: { fontSize: 8, color: colors.gray, lineHeight: 1.3, marginBottom: 8 }
+});
+
 function getStyles(template: TemplateType) {
   switch (template) {
     case "modern": return modernStyles;
     case "compact": return compactStyles;
+    case "executive": return executiveStyles;
+    case "minimal": return minimalStyles;
+    case "creative": return creativeStyles;
+    case "technical": return technicalStyles;
     default: return classicStyles;
   }
 }

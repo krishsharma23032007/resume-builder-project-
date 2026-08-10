@@ -14,6 +14,7 @@ import { RegisterPage } from "@/pages/RegisterPage";
 import { ResumeBuilderPage } from "@/pages/ResumeBuilderPage";
 import { ResumeLibraryPage } from "@/pages/ResumeLibraryPage";
 import { SettingsPage } from "@/pages/SettingsPage";
+import { SharedResumePage } from "@/pages/SharedResumePage";
 import { TemplatesPage } from "@/pages/TemplatesPage";
 
 export const router = createBrowserRouter([
@@ -23,7 +24,8 @@ export const router = createBrowserRouter([
       { path: "/", element: <LandingPage /> },
       { path: "/login", element: <LoginPage /> },
       { path: "/register", element: <RegisterPage /> },
-      { path: "/forgot-password", element: <ForgotPasswordPage /> }
+      { path: "/forgot-password", element: <ForgotPasswordPage /> },
+      { path: "/shared", element: <SharedResumePage /> }
     ]
   },
   {
