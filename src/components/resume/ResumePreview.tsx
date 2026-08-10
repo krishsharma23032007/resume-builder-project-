@@ -23,15 +23,15 @@ export function ResumePreview({ data }: ResumePreviewProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Template selector and Export */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground">Template:</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <span className="text-[10px] font-medium text-muted-foreground sm:text-xs">Template:</span>
           {templateOptions.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setTemplate(opt.value)}
               className={cn(
-                "rounded-lg px-3 py-1 text-xs font-semibold transition-colors",
+                "rounded-lg px-2 py-1 text-[10px] font-semibold transition-colors sm:px-3 sm:text-xs",
                 template === opt.value
                   ? "bg-brutal-ink text-white"
                   : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -45,12 +45,12 @@ export function ResumePreview({ data }: ResumePreviewProps) {
         <ResumePdfExport
           data={data}
           template={template}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-brutal-ink text-white px-3 py-1.5 text-xs font-semibold hover:bg-brutal-ink/90 transition-colors no-underline"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-brutal-ink text-white px-2 py-1 text-[10px] font-semibold hover:bg-brutal-ink/90 transition-colors no-underline sm:px-3 sm:py-1.5 sm:text-xs"
         />
       </div>
 
       {/* Resume preview */}
-      <div className="flex-1 overflow-y-auto rounded-lg border bg-white p-6 shadow-soft">
+      <div className="flex-1 overflow-y-auto rounded-lg border bg-white p-3 shadow-soft sm:p-6">
         {template === "classic" && <ClassicTemplate data={data} />}
         {template === "modern" && <ModernTemplate data={data} />}
         {template === "compact" && <CompactTemplate data={data} />}

@@ -5,8 +5,8 @@ const solutions = ["AI rewrite guidance", "ATS-ready scoring", "Recruiter-grade 
 
 export function ProblemSolution() {
   return (
-    <section className="bg-white px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-2">
+    <section className="bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-5 sm:gap-6 lg:grid-cols-2">
         <Panel
           items={problems}
           tone="problem"
@@ -37,18 +37,18 @@ function Panel({
     <article
       className={
         isSolution
-          ? "rounded-3xl border-2 border-brutal-ink bg-brutal-yellow p-8 shadow-hard-lg"
-          : "rounded-3xl border-2 border-dashed border-zinc-400 bg-zinc-100 p-8 opacity-70"
+          ? "rounded-3xl border-2 border-brutal-ink bg-brutal-yellow p-5 shadow-hard-lg sm:p-8"
+          : "rounded-3xl border-2 border-dashed border-zinc-400 bg-zinc-100 p-5 opacity-70 sm:p-8"
       }
     >
-      <h2 className="font-display text-4xl font-extrabold tracking-tighter text-brutal-ink">
+      <h2 className="font-display text-2xl font-extrabold tracking-tighter text-brutal-ink sm:text-4xl">
         {title}
       </h2>
-      <ul className="mt-8 space-y-4">
+      <ul className="mt-6 space-y-3 sm:mt-8 sm:space-y-4">
         {items.map((item) => (
-          <li className="flex items-center gap-3 text-lg font-extrabold" key={item}>
-            <span className="grid size-8 place-items-center border-2 border-brutal-ink bg-white">
-              {isSolution ? <Check size={18} /> : <X size={18} />}
+          <li className="flex items-center gap-3 text-base font-extrabold sm:text-lg" key={item}>
+            <span className="grid size-7 shrink-0 place-items-center border-2 border-brutal-ink bg-white sm:size-8">
+              {isSolution ? <Check size={16} /> : <X size={16} />}
             </span>
             {item}
           </li>

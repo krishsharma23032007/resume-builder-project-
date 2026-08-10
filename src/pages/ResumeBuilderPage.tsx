@@ -193,48 +193,76 @@ export function ResumeBuilderPage() {
   }
 
   return (
-    <div className="grid min-h-[calc(100vh-4rem)] gap-4 p-4 xl:grid-cols-[240px_1fr_420px]">
-      {/* Left sidebar - Section order */}
-      <aside className="space-y-3">
-        <SectionOrder order={resumeData.sectionOrder} onChange={updateSectionOrder} />
-        <Card>
-          <div className="flex items-center gap-2">
-            <Sparkles size={18} />
-            <h2 className="font-semibold text-sm">AI Tools</h2>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">Analyze and improve your resume.</p>
-        </Card>
-        <div className="sticky top-4 space-y-2">
-          <Button
-            className="w-full"
-            onClick={() => setShowImportModal(true)}
-            size="sm"
-            type="button"
-            variant="outline"
-          >
-            <Download size={16} />
-            Import Resume
-          </Button>
-          <Button
-            className="w-full"
-            disabled={saveStatus === "saving"}
-            onClick={saveResume}
-            type="button"
-          >
-            <Save size={16} />
-            {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved!" : "Save resume"}
-          </Button>
-          {saveStatus === "error" && (
-            <p className="mt-2 text-xs text-red-600">Save failed. Check Firestore permissions.</p>
-          )}
-        </div>
-      </aside>
+    <div className="min-h-[calc(100vh-4rem)] p-4 lg:p-6">
+      {/* Mobile: Top action bar */}
+      <div className="mb-4 flex flex-wrap gap-2 lg:hidden">
+        <Button
+          onClick={() => setShowImportModal(true)}
+          size="sm"
+          type="button"
+          variant="outline"
+        >
+          <Download size={16} />
+          Import
+        </Button>
+        <Button
+          disabled={saveStatus === "saving"}
+          onClick={saveResume}
+          size="sm"
+          type="button"
+        >
+          <Save size={16} />
+          {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved!" : "Save"}
+        </Button>
+      </div>
 
-      {/* Main form area */}
-      <section className="space-y-4">
-        {resumeData.sectionOrder.map((key) => (
-          <div key={key}>{renderSection(key)}</div>
-        ))}
+      <div className="grid gap-4 xl:grid-cols-[240px_1fr_420px]">
+        {/* Left sidebar - Section order (hidden on mobile, shown on desktop) */}
+        <aside className="hidden space-y-3 lg:block">
+          <SectionOrder order={resumeData.sectionOrder} onChange={updateSectionOrder} />
+          <Card>
+            <div className="flex items-center gap-2">
+              <Sparkles size={18} />
+              <h2 className="font-semibold text-sm">AI Tools</h2>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">Analyze and improve your resume.</p>
+          </Card>
+          <div className="sticky top-4 space-y-2">
+            <Button
+              className="w-full"
+              onClick={() => setShowImportModal(true)}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              <Download size={16} />
+              Import Resume
+            </Button>
+            <Button
+              className="w-full"
+              disabled={saveStatus === "saving"}
+              onClick={saveResume}
+              type="button"
+            >
+              <Save size={16} />
+              {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved!" : "Save resume"}
+            </Button>
+            {saveStatus === "error" && (
+              <p className="mt-2 text-xs text-red-600">Save failed. Check Firestore permissions.</p>
+            )}
+          </div>
+        </aside>
+
+        {/* Main form area */}
+        <section className="space-y-4">
+          {/* Mobile: Section order */}
+          <div className="lg:hidden">
+            <SectionOrder order={resumeData.sectionOrder} onChange={updateSectionOrder} />
+          </div>
+
+          {resumeData.sectionOrder.map((key) => (
+            <div key={key}>{renderSection(key)}</div>
+          ))}
 
         {/* AI Tools */}
         <Card>
@@ -366,6 +394,7 @@ export function ResumeBuilderPage() {
       <aside className="rounded-lg border bg-card p-5 flex flex-col">
         <ResumePreview data={resumeData} />
       </aside>
+      </div>
 
       {/* Import Modal */}
       {showImportModal && (
