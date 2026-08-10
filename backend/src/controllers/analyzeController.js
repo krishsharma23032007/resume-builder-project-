@@ -1,6 +1,7 @@
 const { scoreResume } = require("../utils/atsScorer");
 const { matchJobDescription } = require("../utils/jdMatcher");
 const { extractPdfText } = require("../utils/pdfParser");
+const { generateJson } = require("../config/gemini");
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPE = "application/pdf";
@@ -160,7 +161,161 @@ function countResumeWords(resumeData) {
   return words.length;
 }
 
+async function parseResumePdf(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "PDF file is required." });
+    }
+
+    if (req.file.mimetype !== ALLOWED_MIME_TYPE) {
+      return res.status(400).json({ error: "Only PDF files are accepted." });
+    }
+
+    if (req.file.size > MAX_FILE_SIZE) {
+      return res.status(413).json({ error: "File size exceeds the 5MB limit." });
+    }
+
+    let pdfResult;
+    try {
+      pdfResult = await extractPdfText(req.file.buffer);
+    } catch (pdfError) {
+      return res.status(422).json({ error: "Could not process the PDF.", details: pdfError.message });
+    }
+
+    const { text } = pdfResult;
+
+    if (!text || text.trim().length < 50) {
+      return res.status(422).json({ error: "Could not extract enough text from the PDF." });
+    }
+
+    const prompt = `You are an expert resume parser. Extract structured data from this resume text and return it as a JSON object.
+
+Resume text:
+${text}
+
+Return ONLY a JSON object with this exact structure:
+{
+  "personal": {
+    "name": "string",
+    "role": "string",
+    "location": "string",
+    "email": "string",
+    "phone": "string",
+    "summary": "string"
+  },
+  "education": [
+    {
+      "institution": "string",
+      "degree": "string",
+      "field": "string",
+      "startDate": "YYYY-MM",
+      "endDate": "YYYY-MM",
+      "gpa": "string"
+    }
+  ],
+  "experience": [
+    {
+      "company": "string",
+      "title": "string",
+      "location": "string",
+      "startDate": "YYYY-MM",
+      "endDate": "YYYY-MM",
+      "description": "string",
+      "bullets": ["string"]
+    }
+  ],
+  "projects": [
+    {
+      "name": "string",
+      "description": "string",
+      "technologies": "string",
+      "link": "string",
+      "startDate": "YYYY-MM",
+      "endDate": "YYYY-MM",
+      "bullets": ["string"]
+    }
+  ],
+  "skills": [
+    {
+      "category": "string",
+      "items": ["string"]
+    }
+  ],
+  "certifications": [
+    {
+      "name": "string",
+      "issuer": "string",
+      "date": "YYYY-MM",
+      "link": "string"
+    }
+  ],
+  "achievements": [
+    {
+      "title": "string",
+      "description": "string",
+      "date": "YYYY-MM"
+    }
+  ],
+  "languages": [
+    {
+      "name": "string",
+      "proficiency": "beginner|elementary|intermediate|advanced|native"
+    }
+  ],
+  "interests": [
+    {
+      "name": "string"
+    }
+  ]
+}
+
+Rules:
+- Extract all information you can find
+- Use empty strings for missing fields
+- Use empty arrays for missing sections
+- Dates should be in YYYY-MM format when possible
+- For skills, group by category (e.g., "Programming Languages", "Tools", etc.)
+- For proficiency, infer from context or default to "intermediate"
+- Do not add information not present in the resume
+- Return ONLY the JSON object, no other text`;
+
+    const response = await generateJson(prompt);
+
+    if (!response || typeof response !== "object") {
+      return res.status(502).json({ error: "Failed to parse AI response." });
+    }
+
+    const parsed = {
+      personal: {
+        name: response.personal?.name || "",
+        role: response.personal?.role || "",
+        location: response.personal?.location || "",
+        email: response.personal?.email || "",
+        phone: response.personal?.phone || "",
+        summary: response.personal?.summary || ""
+      },
+      education: Array.isArray(response.education) ? response.education : [],
+      experience: Array.isArray(response.experience) ? response.experience : [],
+      projects: Array.isArray(response.projects) ? response.projects : [],
+      skills: Array.isArray(response.skills) ? response.skills : [],
+      certifications: Array.isArray(response.certifications) ? response.certifications : [],
+      achievements: Array.isArray(response.achievements) ? response.achievements : [],
+      languages: Array.isArray(response.languages) ? response.languages : [],
+      interests: Array.isArray(response.interests) ? response.interests : []
+    };
+
+    return res.json({ parsed });
+  } catch (error) {
+    console.error("Parse resume PDF error:", error);
+    if (error.message && error.message.includes("invalid JSON")) {
+      return res.status(502).json({ error: "AI returned an invalid response. Please try again." });
+    }
+    return res.status(500).json({ error: "Failed to parse resume. Please try again later." });
+  }
+}
+
 module.exports = {
   analyzeResume,
-  matchResumeToJob
+  matchResumeToJob,
+  parseResumePdf
 };

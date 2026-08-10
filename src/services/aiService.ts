@@ -31,7 +31,7 @@ interface SuggestAchievementsResponse {
 }
 
 interface GenerateSummaryPayload {
-  resumeContent: string;
+  resumeData: Record<string, unknown>;
 }
 
 interface GenerateSummaryResponse {
@@ -39,27 +39,31 @@ interface GenerateSummaryResponse {
 }
 
 interface GenerateCoverLetterPayload {
+  resumeData: Record<string, unknown>;
   jobDescription: string;
-  resumeContent: string;
+  tone?: "formal" | "enthusiastic" | "concise";
+  company?: string;
+  jobTitle?: string;
 }
 
 interface GenerateCoverLetterResponse {
   coverLetter: string;
+  tone: string;
 }
 
 export const aiService = {
   improveBullet: (payload: ImproveBulletPayload) =>
-    api.post<ImproveBulletResponse>("/ai/improve", payload),
+    api.post<ImproveBulletResponse>("/api/ai/improve", payload),
 
   fixGrammar: (payload: FixGrammarPayload) =>
-    api.post<FixGrammarResponse>("/ai/grammar", payload),
+    api.post<FixGrammarResponse>("/api/ai/grammar", payload),
 
   suggestAchievements: (payload: SuggestAchievementsPayload) =>
-    api.post<SuggestAchievementsResponse>("/ai/suggest-achievements", payload),
+    api.post<SuggestAchievementsResponse>("/api/ai/suggest-achievements", payload),
 
   generateSummary: (payload: GenerateSummaryPayload) =>
-    api.post<GenerateSummaryResponse>("/ai/summary", payload),
+    api.post<GenerateSummaryResponse>("/api/ai/summary", payload),
 
   generateCoverLetter: (payload: GenerateCoverLetterPayload) =>
-    api.post<GenerateCoverLetterResponse>("/ai/cover-letter", payload),
+    api.post<GenerateCoverLetterResponse>("/api/ai/cover-letter", payload),
 };

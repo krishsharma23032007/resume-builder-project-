@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import { FileText, BriefcaseBusiness, Sparkles, LogOut } from "lucide-react";
 import { appNavigation } from "@/data/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { GuruBadgeLogo } from "@/components/common/GuruBadgeLogo";
@@ -16,8 +16,8 @@ export function AppLayout() {
   }
 
   return (
-    <div className="grid min-h-screen bg-muted/40 lg:grid-cols-[260px_1fr]">
-      <aside className="hidden border-r bg-card lg:block">
+    <div className="grid min-h-screen bg-background lg:grid-cols-[260px_1fr]">
+      <aside className="hidden border-r bg-card lg:flex lg:flex-col">
         <Link
           className="flex h-16 items-center gap-3 border-b-2 border-brutal-ink px-6 font-display font-extrabold hover:bg-muted"
           to="/"
@@ -25,7 +25,7 @@ export function AppLayout() {
           <GuruBadgeLogo size="sm" />
           ResumeGuru
         </Link>
-        <nav className="space-y-1 p-3" aria-label="Main navigation">
+        <nav className="flex-1 space-y-1 p-3 overflow-y-auto" aria-label="Main navigation">
           {appNavigation.map((item) => (
             <NavLink
               className={({ isActive }) =>
@@ -41,7 +41,59 @@ export function AppLayout() {
               {item.label}
             </NavLink>
           ))}
+
+          {/* Resume Tools Section */}
+          <div className="mt-4 pt-4 border-t">
+            <p className="px-3 mb-2 text-xs font-semibold uppercase text-muted-foreground">Resume Tools</p>
+
+            <NavLink
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
+                  { "bg-muted text-foreground": isActive }
+                )
+              }
+              to="/ats-analysis"
+            >
+              <FileText size={18} />
+              ATS Analysis
+            </NavLink>
+
+            <NavLink
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
+                  { "bg-muted text-foreground": isActive }
+                )
+              }
+              to="/job-match"
+            >
+              <BriefcaseBusiness size={18} />
+              Job Match
+            </NavLink>
+
+            <NavLink
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
+                  { "bg-muted text-foreground": isActive }
+                )
+              }
+              to="/improve-bullet"
+            >
+              <Sparkles size={18} />
+              Improve Bullet
+            </NavLink>
+          </div>
         </nav>
+
+        {/* Logout at bottom */}
+        <div className="border-t p-3">
+          <Button aria-label="Log out" onClick={handleLogout} size="sm" variant="outline" className="w-full">
+            <LogOut size={16} />
+            <span>Logout</span>
+          </Button>
+        </div>
       </aside>
       <main className="min-w-0">
         <header className="flex h-16 items-center justify-between border-b bg-background px-4 sm:px-6">
@@ -52,12 +104,6 @@ export function AppLayout() {
           <div className="hidden lg:block">
             <p className="text-sm font-medium">{user?.name ?? "Guest"}</p>
             <p className="text-xs text-muted-foreground">AI resume workspace</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button aria-label="Log out" onClick={handleLogout} size="sm" variant="outline">
-              <LogOut size={16} />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
           </div>
         </header>
         <Outlet />

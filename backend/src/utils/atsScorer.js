@@ -264,12 +264,12 @@ function scoreResume(text) {
   } else if (wordCount < 300) {
     wordCountScore = 5;
     suggestions.push("Consider expanding your resume with more role details and achievements.");
-  } else if (wordCount > 800) {
-    wordCountScore = 5;
-    suggestions.push("Resume is quite long. Consider removing low-impact details to keep it concise.");
   } else if (wordCount > 1000) {
     wordCountScore = 0;
     suggestions.push("Resume exceeds recommended length. Trim to 1-2 pages for best ATS results.");
+  } else if (wordCount > 800) {
+    wordCountScore = 5;
+    suggestions.push("Resume is quite long. Consider removing low-impact details to keep it concise.");
   }
 
   // Action verb analysis

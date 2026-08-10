@@ -127,11 +127,22 @@ export const resumeService = {
     return api.post("/api/ai/parse", { text });
   },
 
+  async parseResumePdf(file: File): Promise<{ parsed: ParseResult }> {
+    const formData = new FormData();
+    formData.append("resume", file);
+    return api.post("/api/analyze/parse", formData);
+  },
+
   async generatePdf(resumeData: ResumeData, template: string = "classic"): Promise<Blob> {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"}/api/pdf/generate`, {
+    const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "https://ai-resume-backend-pknw.onrender.com").replace(/\/$/, "");
+    const { auth } = await import("@/lib/firebase");
+    const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+
+    const response = await fetch(`${apiBaseUrl}/api/pdf/generate`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
       },
       body: JSON.stringify({ resumeData, template })
     });

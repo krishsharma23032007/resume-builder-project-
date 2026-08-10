@@ -26,7 +26,7 @@ export function PersonalInfoForm({ data, onChange, resumeData }: PersonalInfoFor
     setSummaryLoading(true);
     setSummaryError(null);
     try {
-      const response = await aiService.generateSummary({ resumeContent: JSON.stringify(resumeData) });
+      const response = await aiService.generateSummary({ resumeData });
       update("summary", response.summary);
     } catch (err) {
       setSummaryError(err instanceof Error ? err.message : "Failed to generate summary");
