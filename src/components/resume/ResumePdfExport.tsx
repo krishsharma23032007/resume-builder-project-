@@ -9,7 +9,7 @@ const colors = {
   white: "#ffffff"
 };
 
-type TemplateType = "classic" | "modern" | "compact" | "executive" | "minimal" | "creative" | "technical";
+type TemplateType = "classic" | "modern" | "compact" | "executive" | "minimal" | "creative" | "technical" | "gradient" | "sidebar" | "timeline" | "magazine" | "corporate" | "bold";
 
 // Classic Template Styles
 const classicStyles = StyleSheet.create({
@@ -123,6 +123,102 @@ const technicalStyles = StyleSheet.create({
   summary: { fontSize: 8, color: colors.gray, lineHeight: 1.3, marginBottom: 8 }
 });
 
+// Gradient Template Styles
+const gradientStyles = StyleSheet.create({
+  page: { padding: 30, fontFamily: "Helvetica", fontSize: 10, color: colors.black },
+  header: { backgroundColor: "#8b5cf6", padding: 20, marginBottom: 20, color: colors.white },
+  name: { fontSize: 24, fontWeight: "bold", color: colors.white, marginBottom: 4 },
+  role: { fontSize: 12, color: colors.white, marginBottom: 6 },
+  contact: { fontSize: 8, color: colors.white, flexDirection: "row", gap: 10 },
+  section: { marginBottom: 14 },
+  sectionTitle: { fontSize: 11, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 1, color: "#8b5cf6", borderBottom: 1, borderBottomColor: "#8b5cf6", paddingBottom: 3, marginBottom: 8 },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  bold: { fontWeight: "bold" },
+  text: { fontSize: 9, color: colors.gray, lineHeight: 1.4 },
+  bullet: { fontSize: 9, color: colors.gray, marginLeft: 10, marginBottom: 1 },
+  summary: { fontSize: 9, color: colors.gray, lineHeight: 1.5, marginBottom: 10 }
+});
+
+// Sidebar Template Styles
+const sidebarStyles = StyleSheet.create({
+  page: { padding: 0, fontFamily: "Helvetica", fontSize: 10, color: colors.black },
+  header: { backgroundColor: "#0d9488", padding: 20, marginBottom: 15, color: colors.white },
+  name: { fontSize: 18, fontWeight: "bold", color: colors.white, marginBottom: 4 },
+  role: { fontSize: 11, color: colors.white, marginBottom: 6 },
+  contact: { fontSize: 8, color: colors.white, flexDirection: "row", gap: 10 },
+  section: { marginBottom: 12 },
+  sectionTitle: { fontSize: 10, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 1, color: "#0d9488", borderBottom: 0.5, borderBottomColor: "#0d9488", paddingBottom: 3, marginBottom: 6 },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  bold: { fontWeight: "bold" },
+  text: { fontSize: 9, color: colors.gray, lineHeight: 1.4 },
+  bullet: { fontSize: 9, color: colors.gray, marginLeft: 10, marginBottom: 1 },
+  summary: { fontSize: 9, color: colors.gray, lineHeight: 1.5, marginBottom: 10 }
+});
+
+// Timeline Template Styles
+const timelineStyles = StyleSheet.create({
+  page: { padding: 30, fontFamily: "Helvetica", fontSize: 10, color: colors.black },
+  header: { textAlign: "center", borderBottom: 2, borderBottomColor: "#f97316", paddingBottom: 10, marginBottom: 15 },
+  name: { fontSize: 22, fontWeight: "bold", marginBottom: 4 },
+  role: { fontSize: 12, color: "#f97316", marginBottom: 6 },
+  contact: { fontSize: 8, color: colors.lightGray, flexDirection: "row", justifyContent: "center", gap: 10 },
+  section: { marginBottom: 14 },
+  sectionTitle: { fontSize: 11, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 1, color: "#f97316", borderBottom: 1, borderBottomColor: "#f97316", paddingBottom: 3, marginBottom: 8 },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  bold: { fontWeight: "bold" },
+  text: { fontSize: 9, color: colors.gray, lineHeight: 1.4 },
+  bullet: { fontSize: 9, color: colors.gray, marginLeft: 10, marginBottom: 1 },
+  summary: { fontSize: 9, color: colors.gray, lineHeight: 1.5, marginBottom: 10 }
+});
+
+// Magazine Template Styles
+const magazineStyles = StyleSheet.create({
+  page: { padding: 30, fontFamily: "Helvetica", fontSize: 10, color: colors.black },
+  header: { borderBottom: 4, borderBottomColor: "#e11d48", paddingBottom: 15, marginBottom: 20 },
+  name: { fontSize: 28, fontWeight: "bold", marginBottom: 4 },
+  role: { fontSize: 12, color: "#e11d48", fontStyle: "italic", marginBottom: 6 },
+  contact: { fontSize: 8, color: colors.lightGray, flexDirection: "row", gap: 10 },
+  section: { marginBottom: 14 },
+  sectionTitle: { fontSize: 11, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 1, color: "#e11d48", borderBottom: 1, borderBottomColor: "#e11d48", paddingBottom: 3, marginBottom: 8 },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  bold: { fontWeight: "bold" },
+  text: { fontSize: 9, color: colors.gray, lineHeight: 1.4 },
+  bullet: { fontSize: 9, color: colors.gray, marginLeft: 10, marginBottom: 1 },
+  summary: { fontSize: 9, color: colors.gray, lineHeight: 1.5, marginBottom: 10 }
+});
+
+// Corporate Template Styles
+const corporateStyles = StyleSheet.create({
+  page: { padding: 30, fontFamily: "Helvetica", fontSize: 10, color: colors.black },
+  header: { flexDirection: "row", borderBottom: 2, borderBottomColor: "#4338ca", paddingBottom: 15, marginBottom: 15 },
+  name: { fontSize: 22, fontWeight: "bold", color: "#4338ca", marginBottom: 4 },
+  role: { fontSize: 12, color: colors.gray, marginBottom: 6 },
+  contact: { fontSize: 8, color: colors.lightGray, flexDirection: "row", gap: 10 },
+  section: { marginBottom: 14 },
+  sectionTitle: { fontSize: 11, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 1, color: "#4338ca", borderBottom: 1, borderBottomColor: "#4338ca", paddingBottom: 3, marginBottom: 8 },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  bold: { fontWeight: "bold" },
+  text: { fontSize: 9, color: colors.gray, lineHeight: 1.4 },
+  bullet: { fontSize: 9, color: colors.gray, marginLeft: 10, marginBottom: 1 },
+  summary: { fontSize: 9, color: colors.gray, lineHeight: 1.5, marginBottom: 10 }
+});
+
+// Bold Template Styles
+const boldStyles = StyleSheet.create({
+  page: { padding: 30, fontFamily: "Helvetica", fontSize: 10, color: colors.black },
+  header: { backgroundColor: "#d97706", padding: 20, marginBottom: 20, color: colors.white },
+  name: { fontSize: 28, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 2, color: colors.white, marginBottom: 4 },
+  role: { fontSize: 14, fontWeight: "bold", color: colors.white, marginBottom: 6 },
+  contact: { fontSize: 8, color: colors.white, flexDirection: "row", gap: 10 },
+  section: { marginBottom: 14 },
+  sectionTitle: { fontSize: 14, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 2, color: "#d97706", borderBottom: 4, borderBottomColor: "#d97706", paddingBottom: 4, marginBottom: 10 },
+  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  bold: { fontWeight: "bold" },
+  text: { fontSize: 9, color: colors.gray, lineHeight: 1.4 },
+  bullet: { fontSize: 9, color: colors.gray, marginLeft: 10, marginBottom: 1 },
+  summary: { fontSize: 9, color: colors.gray, lineHeight: 1.5, marginBottom: 10 }
+});
+
 function getStyles(template: TemplateType) {
   switch (template) {
     case "modern": return modernStyles;
@@ -131,6 +227,12 @@ function getStyles(template: TemplateType) {
     case "minimal": return minimalStyles;
     case "creative": return creativeStyles;
     case "technical": return technicalStyles;
+    case "gradient": return gradientStyles;
+    case "sidebar": return sidebarStyles;
+    case "timeline": return timelineStyles;
+    case "magazine": return magazineStyles;
+    case "corporate": return corporateStyles;
+    case "bold": return boldStyles;
     default: return classicStyles;
   }
 }
