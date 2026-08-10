@@ -40,11 +40,11 @@ type EntryCardProps = {
 
 export function EntryCard({ children, onDelete, title }: EntryCardProps) {
   return (
-    <div className="rounded-lg border border-muted p-4 space-y-3 relative">
+    <div className="rounded-lg border border-muted p-4 pr-12 space-y-3 relative">
       {title && <p className="text-sm font-medium text-muted-foreground">{title}</p>}
       {children}
       <Button
-        className="absolute top-2 right-2"
+        className="absolute top-3 right-3"
         onClick={onDelete}
         size="sm"
         type="button"
