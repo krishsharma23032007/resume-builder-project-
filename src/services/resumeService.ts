@@ -94,6 +94,26 @@ export interface ParseResult {
   }>;
 }
 
+export interface ShareResult {
+  shareId: string;
+  shareUrl: string;
+  expiresAt: string;
+}
+
+export interface SharedResume {
+  resumeData: ResumeData;
+  createdAt: string;
+  viewCount: number;
+}
+
+export interface ShareListItem {
+  shareId: string;
+  createdAt: string;
+  expiresAt: string | null;
+  viewCount: number;
+  personalName: string;
+}
+
 export const resumeService = {
   async analyzeResume(file: File): Promise<AnalyzeResult> {
     const formData = new FormData();
@@ -152,5 +172,42 @@ export const resumeService = {
     }
 
     return response.blob();
+  },
+
+  async generateDocx(resumeData: ResumeData, template: string = "classic"): Promise<Blob> {
+    const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "https://ai-resume-backend-pknw.onrender.com").replace(/\/$/, "");
+    const { auth } = await import("@/lib/firebase");
+    const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+
+    const response = await fetch(`${apiBaseUrl}/api/pdf/generate-docx`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({ resumeData, template })
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to generate DOCX");
+    }
+
+    return response.blob();
+  },
+
+  async createShareLink(resumeData: ResumeData, expiresIn?: number): Promise<ShareResult> {
+    return api.post("/api/share/create", { resumeData, expiresIn });
+  },
+
+  async getSharedResume(shareId: string): Promise<SharedResume> {
+    return api.get(`/api/public/share/${shareId}`);
+  },
+
+  async deleteShareLink(shareId: string): Promise<{ message: string }> {
+    return api.delete(`/api/share/${shareId}`);
+  },
+
+  async listShareLinks(): Promise<{ shares: ShareListItem[] }> {
+    return api.get("/api/share");
   }
 };

@@ -5,6 +5,8 @@ const express = require("express");
 const analyzeRoutes = require("./routes/analyze");
 const aiRoutes = require("./routes/ai");
 const pdfRoutes = require("./routes/pdf");
+const profileRoutes = require("./routes/profile");
+const shareRoutes = require("./routes/share");
 const verifyToken = require("./middleware/auth");
 const rateLimiter = require("./middleware/rateLimiter");
 const sanitizeInput = require("./middleware/sanitize");
@@ -60,6 +62,9 @@ app.get("/api/health", (req, res) => {
 app.use("/api", verifyToken, analyzeRoutes);
 app.use("/api/ai", verifyToken, aiRoutes);
 app.use("/api/pdf", verifyToken, pdfRoutes);
+app.use("/api/profile", verifyToken, profileRoutes);
+app.use("/api/share", verifyToken, shareRoutes);
+app.use("/api/public/share", shareRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found." });
