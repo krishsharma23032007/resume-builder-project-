@@ -132,7 +132,6 @@ async function listShareLinks(req, res) {
 
     const snapshot = await resumesCollection
       .where("userId", "==", userId)
-      .orderBy("createdAt", "desc")
       .limit(50)
       .get();
 
@@ -141,12 +140,15 @@ async function listShareLinks(req, res) {
       const data = doc.data();
       shares.push({
         shareId: doc.id,
-        createdAt: data.createdAt.toDate().toISOString(),
-        expiresAt: data.expiresAt ? data.expiresAt.toDate().toISOString() : null,
+        createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        expiresAt: data.expiresAt?.toDate?.()?.toISOString() || null,
         viewCount: data.viewCount || 0,
         personalName: data.resumeData?.personal?.name || "Untitled"
       });
     });
+
+    // Sort by createdAt descending in memory
+    shares.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return res.json({ shares });
   } catch (error) {
