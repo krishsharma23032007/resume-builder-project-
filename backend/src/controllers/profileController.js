@@ -1,8 +1,8 @@
-const { admin } = require("../config/firebase");
-const { getAuth } = require("../config/firebase");
+const { admin, getAuth } = require("../config/firebase");
 
-const db = admin.firestore();
-const profilesCollection = db.collection("user_profiles");
+function getProfilesCollection() {
+  return admin.firestore().collection("user_profiles");
+}
 
 /**
  * Get user profile settings.
@@ -14,6 +14,7 @@ async function getProfile(req, res) {
       return res.status(401).json({ error: "Authentication required." });
     }
 
+    const profilesCollection = getProfilesCollection();
     const doc = await profilesCollection.doc(userId).get();
 
     if (!doc.exists) {
@@ -84,6 +85,7 @@ async function updateProfile(req, res) {
 
     profileData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
 
+    const profilesCollection = getProfilesCollection();
     await profilesCollection.doc(userId).set(profileData, { merge: true });
 
     return res.json({ message: "Profile updated successfully." });

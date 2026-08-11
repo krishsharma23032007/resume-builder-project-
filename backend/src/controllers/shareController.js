@@ -1,8 +1,9 @@
 const crypto = require("crypto");
 const { admin } = require("../config/firebase");
 
-const db = admin.firestore();
-const resumesCollection = db.collection("shared_resumes");
+function getResumesCollection() {
+  return admin.firestore().collection("shared_resumes");
+}
 
 /**
  * Creates a shareable link for a resume.
@@ -25,6 +26,7 @@ async function createShareLink(req, res) {
       new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000)
     );
 
+    const resumesCollection = getResumesCollection();
     await resumesCollection.doc(shareId).set({
       userId,
       resumeData,
@@ -58,6 +60,7 @@ async function getSharedResume(req, res) {
       return res.status(400).json({ error: "Invalid share ID." });
     }
 
+    const resumesCollection = getResumesCollection();
     const doc = await resumesCollection.doc(shareId).get();
 
     if (!doc.exists) {
@@ -99,6 +102,7 @@ async function deleteShareLink(req, res) {
       return res.status(400).json({ error: "Invalid share ID." });
     }
 
+    const resumesCollection = getResumesCollection();
     const doc = await resumesCollection.doc(shareId).get();
 
     if (!doc.exists) {
@@ -130,6 +134,7 @@ async function listShareLinks(req, res) {
       return res.status(401).json({ error: "Authentication required." });
     }
 
+    const resumesCollection = getResumesCollection();
     const snapshot = await resumesCollection
       .where("userId", "==", userId)
       .limit(50)
