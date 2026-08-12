@@ -53,9 +53,15 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/health", (req, res) => {
+  const mimoKey = process.env.MIMO_API_KEY;
   res.json({
     status: "ok",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    aiConfigured: !!mimoKey,
+    mimoKeyLength: mimoKey ? mimoKey.length : 0,
+    mimoKeyPrefix: mimoKey ? mimoKey.substring(0, 8) + "..." : "not set",
+    mimoBaseUrl: process.env.MIMO_API_BASE_URL || "default",
+    mimoModel: process.env.MIMO_MODEL || "default"
   });
 });
 
