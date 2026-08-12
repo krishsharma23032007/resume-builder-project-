@@ -150,7 +150,7 @@ export const resumeService = {
   async parseResumePdf(file: File): Promise<{ parsed: ParseResult }> {
     const formData = new FormData();
     formData.append("resume", file);
-    return api.post("/api/analyze/parse", formData);
+    return api.post("/api/parse", formData);
   },
 
   async generatePdf(resumeData: ResumeData, template: string = "classic"): Promise<Blob> {
