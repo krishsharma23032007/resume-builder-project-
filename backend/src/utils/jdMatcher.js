@@ -1,51 +1,77 @@
 const KEYWORDS = [
-  "React",
-  "Node.js",
-  "Python",
-  "Java",
-  "SQL",
-  "AWS",
-  "Docker",
-  "Kubernetes",
-  "TypeScript",
-  "JavaScript",
-  "HTML",
-  "CSS",
-  "MongoDB",
-  "PostgreSQL",
-  "Git",
-  "Agile",
-  "REST API",
-  "GraphQL",
-  "CI/CD",
-  "Linux",
-  "Azure",
-  "GCP",
-  "Machine Learning",
-  "Data Analysis",
-  "Excel",
-  "Tableau",
-  "PowerBI",
-  "Figma",
-  "Sketch",
-  "Photoshop",
-  "Express",
-  "Firebase",
-  "Firestore",
-  "Next.js",
-  "Redux",
-  "Tailwind",
-  "Jest",
-  "Testing",
-  "DevOps",
-  "Microservices",
-  "SaaS"
+  "React", "Node.js", "Python", "Java", "SQL", "AWS", "Docker", "Kubernetes",
+  "TypeScript", "JavaScript", "HTML", "CSS", "MongoDB", "PostgreSQL", "Git",
+  "Agile", "REST API", "GraphQL", "CI/CD", "Linux", "Azure", "GCP",
+  "Machine Learning", "Data Analysis", "Excel", "Tableau", "PowerBI",
+  "Figma", "Sketch", "Photoshop", "Express", "Firebase", "Firestore",
+  "Next.js", "Redux", "Tailwind", "Jest", "Testing", "DevOps",
+  "Microservices", "SaaS", "C++", "C#", "Ruby", "Go", "Rust", "Swift",
+  "Kotlin", "PHP", "Laravel", "Django", "Flask", "Spring", "Angular",
+  "Vue", "Svelte", "Webpack", "Vite", "Nginx", "Apache", "Redis",
+  "Elasticsearch", "Kafka", "RabbitMQ", "Terraform", "Jenkins", "GitHub",
+  "GitLab", "Jira", "Confluence", "Scrum", "Kanban", "REST", "SOAP",
+  "GraphQL", "gRPC", "WebSocket", "OAuth", "JWT", "SSL", "TLS",
+  "Microservices", "Serverless", "Lambda", "EC2", "S3", "RDS",
+  "DynamoDB", "CloudFormation", "ECS", "EKS", "Fargate",
+  "Python", "Pandas", "NumPy", "Scikit-learn", "TensorFlow", "PyTorch",
+  "NLP", "Computer Vision", "Deep Learning", "AI", "ML",
+  "Data Science", "Data Engineering", "ETL", "Spark", "Hadoop",
+  "Power BI", "Looker", "Metabase", "Analytics", "Visualization",
+  "Product Management", "Project Management", "Stakeholder",
+  "Communication", "Leadership", "Team Management", "Mentoring",
+  "Problem Solving", "Critical Thinking", "Collaboration"
 ];
+
+/**
+ * Extracts meaningful keywords from job description text.
+ * Goes beyond the hardcoded list to find skills, technologies, and requirements.
+ */
+function extractKeywordsFromText(text) {
+  const normalized = text.toLowerCase();
+  const found = new Set();
+
+  // Match from hardcoded list
+  for (const keyword of KEYWORDS) {
+    if (normalized.includes(keyword.toLowerCase())) {
+      found.add(keyword);
+    }
+  }
+
+  // Extract capitalized terms (likely skills/technologies)
+  const capitalizedTerms = text.match(/\b[A-Z][a-zA-Z+#.]{2,}\b/g) || [];
+  for (const term of capitalizedTerms) {
+    if (term.length >= 3 && term.length <= 30) {
+      found.add(term);
+    }
+  }
+
+  // Extract common patterns like "X years of experience"
+  const yearPatterns = text.match(/\d+\+?\s*years?\s+(?:of\s+)?(?:experience|exp)\s+(?:in|with)\s+([^,.]+)/gi) || [];
+  for (const match of yearPatterns) {
+    const skills = match.replace(/\d+\+?\s*years?\s+(?:of\s+)?(?:experience|exp)\s+(?:in|with)\s+/i, '').trim();
+    found.add(skills);
+  }
+
+  // Extract bullet point items (often requirements)
+  const bulletItems = text.match(/(?:^|\n)\s*[•\-\*]\s*(.+?)(?:\n|$)/gm) || [];
+  for (const item of bulletItems) {
+    const cleaned = item.replace(/^[•\-\*\s]+/, '').trim();
+    if (cleaned.length >= 3 && cleaned.length <= 50) {
+      // Extract the main noun/phrase
+      const words = cleaned.split(/\s+/).slice(0, 3).join(' ');
+      if (words.length >= 3) {
+        found.add(words);
+      }
+    }
+  }
+
+  return [...found];
+}
 
 function matchJobDescription(resumeData, jobDescription) {
   const jdText = jobDescription || "";
   const resumeText = flattenResumeData(resumeData);
-  const jdKeywords = extractKeywords(jdText);
+  const jdKeywords = extractKeywordsFromText(jdText);
 
   if (!jdKeywords.length) {
     return {
@@ -58,23 +84,27 @@ function matchJobDescription(resumeData, jobDescription) {
     };
   }
 
-  const matchedKeywords = jdKeywords.filter((keyword) => containsKeyword(resumeText, keyword));
-  const missingKeywords = jdKeywords.filter((keyword) => !matchedKeywords.includes(keyword));
+  const matchedKeywords = [];
+  const missingKeywords = [];
+
+  for (const keyword of jdKeywords) {
+    if (containsKeyword(resumeText, keyword)) {
+      matchedKeywords.push(keyword);
+    } else {
+      missingKeywords.push(keyword);
+    }
+  }
+
   const matchPercentage = Math.round((matchedKeywords.length / jdKeywords.length) * 100);
 
   return {
     matchPercentage,
-    matchedKeywords,
-    missingKeywords,
-    skillGaps: missingKeywords,
+    matchedKeywords: matchedKeywords.slice(0, 20),
+    missingKeywords: missingKeywords.slice(0, 20),
+    skillGaps: missingKeywords.slice(0, 10),
     experienceGaps: buildExperienceGaps(missingKeywords, resumeText),
     recommendations: buildRecommendations(matchPercentage, missingKeywords)
   };
-}
-
-function extractKeywords(text) {
-  const found = KEYWORDS.filter((keyword) => containsKeyword(text, keyword));
-  return [...new Set(found)];
 }
 
 function containsKeyword(text, keyword) {
@@ -134,6 +164,6 @@ function buildRecommendations(matchPercentage, missingKeywords) {
 
 module.exports = {
   KEYWORDS,
-  extractKeywords,
+  extractKeywordsFromText,
   matchJobDescription
 };

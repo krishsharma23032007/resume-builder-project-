@@ -20,7 +20,7 @@ export function AppLayout() {
       <aside className="hidden border-r bg-card lg:flex lg:flex-col">
         <Link
           className="flex h-16 items-center gap-3 border-b-2 border-brutal-ink px-6 font-display font-extrabold hover:bg-muted"
-          to="/"
+          to="/dashboard"
         >
           <GuruBadgeLogo size="sm" />
           ResumeGuru
@@ -97,7 +97,7 @@ export function AppLayout() {
       </aside>
       <main className="min-w-0">
         <header className="flex h-16 items-center justify-between border-b bg-background px-4 sm:px-6">
-          <Link className="flex items-center gap-2 lg:hidden" to="/">
+          <Link className="flex items-center gap-2 lg:hidden" to="/dashboard">
             <GuruBadgeLogo size="sm" />
             <span className="font-display font-extrabold">ResumeGuru</span>
           </Link>
