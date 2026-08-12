@@ -56,9 +56,9 @@ export function Navbar() {
               onClick={() => goToSection(link.id)}
             />
           ))}
-          <Link className="text-sm font-extrabold text-brutal-ink hover:underline" to="/templates">
-            Templates
-          </Link>
+          <a className="text-sm font-extrabold text-brutal-ink hover:underline" href="mailto:resumeguru@gmail.com">
+            Contact Us
+          </a>
         </div>
 
         <div className="hidden items-center gap-2 sm:flex">
@@ -97,9 +97,9 @@ export function Navbar() {
                 onClick={() => goToSection(link.id)}
               />
             ))}
-            <Link className="text-sm font-extrabold text-brutal-ink" onClick={closeMenu} to="/templates">
-              Templates
-            </Link>
+            <a className="text-sm font-extrabold text-brutal-ink" onClick={closeMenu} href="mailto:resumeguru@gmail.com">
+              Contact Us
+            </a>
             <div className="grid grid-cols-2 gap-2 pt-2">
               <Link onClick={closeMenu} to="/login">
                 <Button className="w-full" size="sm" variant="outline">
