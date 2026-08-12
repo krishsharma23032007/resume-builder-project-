@@ -39,7 +39,7 @@ export function ResumeBuilderPage() {
   const [showImportModal, setShowImportModal] = useState(false);
 
   const resumeDataForApi = {
-    personalInfo: resumeData.personal,
+    personal: resumeData.personal,
     experience: resumeData.experience,
     education: resumeData.education,
     skills: resumeData.skills,
