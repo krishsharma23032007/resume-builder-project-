@@ -89,7 +89,7 @@ Return ONLY a JSON object: {"improved": "string", "explanation": "string"}`;
     if (error.message && error.message.includes("invalid JSON")) {
       return res.status(502).json({ error: "AI returned an invalid response. Please try again." });
     }
-    return res.status(500).json({ error: "Failed to improve resume bullet. Please try again later." });
+    return res.status(500).json({ error: error.message || "Failed to improve resume bullet. Please try again later." });
   }
 }
 
@@ -169,7 +169,7 @@ Rules:
     return res.json({ summary: summary.trim() });
   } catch (error) {
     console.error("Generate summary error:", error);
-    return res.status(500).json({ error: "Failed to generate resume summary." });
+    return res.status(500).json({ error: error.message || "Failed to generate resume summary." });
   }
 }
 
@@ -300,7 +300,7 @@ Rules:
     if (error.message && error.message.includes("invalid JSON")) {
       return res.status(502).json({ error: "AI returned an invalid response. Please try again." });
     }
-    return res.status(500).json({ error: "Failed to fix grammar. Please try again later." });
+    return res.status(500).json({ error: error.message || "Failed to fix grammar. Please try again later." });
   }
 }
 
