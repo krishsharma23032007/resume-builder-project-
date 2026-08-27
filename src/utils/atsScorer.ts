@@ -237,9 +237,18 @@ export function scoreResumeLive(data: ResumeData): AtsResult {
 
   for (const check of sectionChecks) {
     if (check.found) {
-      // Also check content patterns for bonus
-      const contentMatch = check.rule.contentPatterns.some((p) => p.test(text));
-      sectionScore += contentMatch ? check.rule.points : Math.round(check.rule.points * 0.7);
+      if (check.rule.contentPatterns.length === 0) {
+        // No content patterns to validate (e.g. summary) — award points for presence
+        sectionScore += check.rule.points;
+      } else {
+        // Only award points when content patterns match
+        const contentMatch = check.rule.contentPatterns.some((p) => p.test(text));
+        if (contentMatch) {
+          sectionScore += check.rule.points;
+        } else {
+          suggestions.push(`Add relevant content to your "${check.rule.label}" section (e.g. keywords, details).`);
+        }
+      }
     } else if (check.rule.required) {
       suggestions.push(`Add a "${check.rule.label}" section to improve ATS compatibility.`);
     }
