@@ -14,6 +14,7 @@ import { InterestsForm } from "@/components/resume/InterestsForm";
 import { SectionOrder } from "@/components/resume/SectionOrder";
 import { ResumePreview } from "@/components/resume/ResumePreview";
 import { ResumeImportModal } from "@/components/common/ResumeImportModal";
+import { LiveAtsScore } from "@/components/resume/LiveAtsScore";
 import { type ParseResult } from "@/services/resumeService";
 import { useState } from "react";
 import { generateId } from "@/utils/generateId";
@@ -164,6 +165,8 @@ export function ResumeBuilderPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] p-4 lg:p-6">
+      <LiveAtsScore resumeData={resumeData} />
+
       {/* Mobile: Top action bar */}
       <div className="mb-4 flex flex-wrap gap-2 lg:hidden">
         <Button
