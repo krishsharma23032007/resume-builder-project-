@@ -1,11 +1,34 @@
 import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, type User } from "firebase/auth";
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "https://ai-resume-backend-pknw.onrender.com").replace(/\/$/, "");
 
+let currentUser: User | null = auth.currentUser;
+let authReady: Promise<void>;
+
+// Listen for auth state changes so we always have a fresh reference
+if (auth.currentUser) {
+  authReady = Promise.resolve();
+} else {
+  authReady = new Promise((resolve) => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      unsub();
+      resolve();
+    });
+  });
+}
+
 async function getIdToken(): Promise<string | null> {
-  const user = auth.currentUser;
+  // Wait for Firebase auth to initialize before reading currentUser
+  await authReady;
+  const user = currentUser ?? auth.currentUser;
   if (!user) return null;
-  return user.getIdToken();
+  try {
+    return await user.getIdToken();
+  } catch {
+    return null;
+  }
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -14,9 +37,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...(options.headers as Record<string, string>)
   };
 
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+  if (!token) {
+    throw new Error("You must be logged in to perform this action.");
   }
+
+  headers["Authorization"] = `Bearer ${token}`;
 
   if (!(options.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
