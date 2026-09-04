@@ -1,4 +1,6 @@
 AI Resume Builder & Analyzer is a web application that helps students, fresh graduates, and job seekers create professional resumes, analyze resume quality, and tailor resumes for specific job descriptions.
+
 The platform allows users to build resumes from scratch, save multiple resume versions, upload existing resumes for ATS analysis, compare resumes with job descriptions, and use AI tools to improve bullet points, generate summaries, and create cover letters.
+
 It uses Firebase for authentication and resume storage, a React frontend for the user interface, and a Node.js/Express backend for secure AI processing, PDF parsing, ATS scoring, and job-description matching. The goal is to reduce resume creation time, improve ATS compatibility, and give users practical suggestions to make their resumes stronger and more job-focused.
 
